@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { PRODUCTS } from "@/data/products";
@@ -24,12 +24,72 @@ import { useCompare } from "@/context/CompareContext";
 import { useStore } from "@/context/StoreContext";
 import { formatPrice, calculateEstimatedDelivery } from "@/lib/utils";
 import { ProductCard } from "@/components/shop/ProductCard";
+import { Product } from "@/types";
 
 export default function ProductDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
 
-  const product = PRODUCTS.find((p) => p.slug === slug) || PRODUCTS[0];
+  const staticProduct = PRODUCTS.find((p) => p.slug === slug) || PRODUCTS[0];
+  const [product, setProduct] = useState<Product>(staticProduct);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>(PRODUCTS);
+
+  useEffect(() => {
+    const fetchProductFromDb = async () => {
+      try {
+        const res = await fetch("/api/products");
+        const data = await res.json();
+        if (data.success && data.products && data.products.length > 0) {
+          const formattedDbProducts: Product[] = data.products.map((p: any) => ({
+            id: p.id,
+            slug: p.slug,
+            title: p.title,
+            tagline: p.tagline,
+            subtitle: p.subtitle,
+            price: p.price,
+            originalPrice: p.originalPrice || p.price,
+            discountPercentage: p.discountPercentage || 0,
+            category: p.category,
+            silkType: p.silkType,
+            weavingStyle: p.weavingStyle || "Handloom",
+            occasion: p.occasion || "Bridal",
+            stateOrigin: p.stateOrigin || "Sualkuchi, Assam",
+            rating: p.rating || 5.0,
+            reviewCount: p.reviewCount || 0,
+            sku: p.sku,
+            stock: p.stock || 10,
+            inStock: p.inStock ?? true,
+            isSilkMarkCertified: p.isSilkMarkCertified ?? true,
+            isBestSeller: p.isBestSeller ?? false,
+            isNewArrival: p.isNewArrival ?? true,
+            isTrending: p.isTrending ?? false,
+            isBridal: p.isBridal ?? false,
+            dimensions: p.dimensions || "Saree: 5.5m x 1.15m | Blouse: 0.9m",
+            weight: p.weight || "750 grams",
+            description: p.description,
+            story: p.story,
+            images: p.images?.length > 0 ? p.images.map((img: any) => img.url) : ["https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=1200"],
+            colors: p.colors?.length > 0 ? p.colors : [{ name: "Standard Gold", hex: "#D4AF37" }],
+            reviews: p.reviews || [],
+          }));
+
+          const matched = formattedDbProducts.find((p) => p.slug === slug || p.id === slug);
+          if (matched) {
+            setProduct(matched);
+          } else {
+            const staticMatch = PRODUCTS.find((p) => p.slug === slug);
+            if (staticMatch) setProduct(staticMatch);
+          }
+
+          setRelatedProducts(formattedDbProducts);
+        }
+      } catch (err) {
+        console.error("Failed to fetch product details from DB:", err);
+      }
+    };
+
+    fetchProductFromDb();
+  }, [slug]);
 
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -38,7 +98,7 @@ export default function ProductDetailPage() {
 
   const [selectedImg, setSelectedImg] = useState<number>(0);
   const [selectedColor, setSelectedColor] = useState<string>(
-    product.colors[0] ? product.colors[0].name : ""
+    product.colors?.[0] ? product.colors[0].name : "Standard"
   );
   const [customBlouse, setCustomBlouse] = useState(false);
   const [pincode, setPincode] = useState("");
@@ -49,8 +109,6 @@ export default function ProductDetailPage() {
   } | null>(null);
   const [added, setAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<"desc" | "craft" | "care" | "reviews">("desc");
-  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-  const [is360Active, setIs360Active] = useState(false);
 
   const handleCheckDelivery = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,289 +122,233 @@ export default function ProductDetailPage() {
     setTimeout(() => setAdded(false), 2000);
   };
 
-  const relatedProducts = PRODUCTS.filter((p) => p.id !== product.id && p.silkType === product.silkType).slice(0, 4);
-
   return (
-    <div className="py-12 bg-silk-ivory min-h-screen font-sans">
+    <div className="bg-silk-ivory min-h-screen font-sans py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
-        {/* Breadcrumb Navigation */}
-        <nav className="text-xs text-silk-black/60 font-serif flex items-center gap-2">
-          <Link href="/" className="hover:text-silk-maroon">Home</Link>
+        {/* Breadcrumb Trail */}
+        <nav className="text-xs font-serif uppercase tracking-widest text-silk-black/60 flex items-center gap-2">
+          <Link href="/" className="hover:text-silk-maroon transition">
+            Home
+          </Link>
           <span>/</span>
-          <Link href="/shop" className="hover:text-silk-maroon">Shop Catalog</Link>
+          <Link href="/shop" className="hover:text-silk-maroon transition">
+            Shop Catalog
+          </Link>
           <span>/</span>
-          <Link href={`/shop?silk=${encodeURIComponent(product.silkType)}`} className="hover:text-silk-maroon">{product.silkType}</Link>
-          <span>/</span>
-          <span className="text-silk-maroon font-bold truncate max-w-[200px]">{product.title}</span>
+          <span className="text-silk-maroon font-bold line-clamp-1">{product.title}</span>
         </nav>
 
-        {/* Primary Product Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          {/* Left Column: Image Gallery */}
+        {/* Product Details Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          {/* Product Gallery (Left) */}
           <div className="lg:col-span-7 space-y-4">
-            <div className="relative aspect-[3/4] bg-silk-beige rounded-2xl overflow-hidden shadow-card border border-silk-gold/30">
+            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-silk-gold/30 shadow-card bg-silk-cream">
               <img
                 src={product.images[selectedImg] || product.images[0]}
                 alt={product.title}
-                className={`w-full h-full object-cover transition-transform duration-500 ${
-                  is360Active ? "animate-pulse" : ""
-                }`}
+                className="w-full h-full object-cover"
               />
 
-              {/* Silk Mark Seal Badge */}
               {product.isSilkMarkCertified && (
-                <div className="absolute top-4 left-4 bg-silk-gold text-silk-black font-extrabold text-xs px-3 py-1 rounded shadow-md flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-silk-maroon" /> 100% Silk Mark Certified
-                </div>
+                <span className="absolute top-4 left-4 bg-silk-ivory/90 backdrop-blur-md text-silk-maroon text-xs font-serif font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-silk-gold/40 shadow-sm flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-silk-gold" /> Silk Mark Certified
+                </span>
               )}
+            </div>
 
-              {/* 360 & Video Overlay Triggers */}
-              <div className="absolute bottom-4 right-4 flex gap-2">
-                <button
-                  onClick={() => setIs360Active(!is360Active)}
-                  className={`px-3 py-1.5 rounded-full backdrop-blur-md text-xs font-bold shadow flex items-center gap-1 transition ${
-                    is360Active ? "bg-silk-maroon text-silk-gold" : "bg-silk-ivory/90 text-silk-maroon hover:bg-silk-gold"
-                  }`}
-                >
-                  <Rotate3d className="w-4 h-4" /> 360° Loom View
-                </button>
-                <button
-                  onClick={() => setIsVideoModalOpen(true)}
-                  className="px-3 py-1.5 rounded-full bg-silk-maroon text-silk-gold hover:bg-silk-maroon-dark backdrop-blur-md text-xs font-bold shadow flex items-center gap-1 transition"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current" /> Loom Video
-                </button>
+            {/* Thumbnail Carousel */}
+            {product.images.length > 1 && (
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {product.images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImg(idx)}
+                    className={`relative w-20 h-24 rounded-lg overflow-hidden border-2 transition flex-shrink-0 ${
+                      selectedImg === idx ? "border-silk-maroon shadow-md" : "border-silk-gold/20 opacity-70 hover:opacity-100"
+                    }`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
               </div>
-            </div>
-
-            {/* Thumbnail Selector */}
-            <div className="flex gap-3 overflow-x-auto pb-2">
-              {product.images.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    setSelectedImg(idx);
-                    setIs360Active(false);
-                  }}
-                  className={`relative w-20 h-24 rounded-lg overflow-hidden border-2 transition flex-shrink-0 ${
-                    selectedImg === idx ? "border-silk-maroon scale-105 shadow" : "border-silk-gold/30 opacity-70"
-                  }`}
-                >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
+            )}
           </div>
 
-          {/* Right Column: Information & Actions */}
+          {/* Product Information (Right) */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="space-y-2 border-b border-silk-gold/30 pb-4">
-              <span className="text-xs uppercase font-bold tracking-widest text-silk-maroon bg-silk-gold/20 px-2.5 py-1 rounded">
-                {product.silkType} • {product.weavingStyle}
+            <div className="space-y-2">
+              <span className="text-xs font-serif font-bold tracking-[0.25em] text-silk-gold-dark uppercase block">
+                {product.silkType} • {product.stateOrigin}
               </span>
-              <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-silk-black mt-2">
+              <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-silk-maroon leading-tight">
                 {product.title}
               </h1>
-              <p className="text-xs text-silk-black/70 italic font-serif">{product.subtitle}</p>
-
-              {/* Ratings */}
-              <div className="flex items-center gap-2 pt-1">
-                <div className="flex text-silk-gold">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-4 h-4 ${i < Math.floor(product.rating) ? "fill-current" : ""}`}
-                    />
-                  ))}
-                </div>
-                <span className="text-xs font-bold text-silk-maroon">{product.rating}</span>
-                <span className="text-xs text-silk-black/60">({product.reviewCount} Verified Reviews)</span>
-              </div>
+              <p className="text-xs text-silk-black/60 font-light italic">
+                {product.subtitle || product.tagline}
+              </p>
             </div>
 
-            {/* Pricing */}
-            <div className="space-y-1">
-              <div className="flex items-baseline gap-3">
-                <span className="font-serif font-extrabold text-3xl text-silk-maroon">
-                  {formatPrice(product.price, currency)}
-                </span>
-                {product.originalPrice > product.price && (
-                  <span className="text-sm text-silk-black/40 line-through">
-                    {formatPrice(product.originalPrice, currency)}
+            {/* Price & Rating */}
+            <div className="flex items-center justify-between border-y border-silk-gold/20 py-4">
+              <div className="space-y-1">
+                <div className="flex items-baseline gap-3">
+                  <span className="font-serif font-extrabold text-2xl text-silk-maroon">
+                    {formatPrice(product.price, currency)}
                   </span>
-                )}
-                {product.discountPercentage > 0 && (
-                  <span className="text-xs bg-silk-emerald text-silk-ivory font-bold px-2 py-0.5 rounded">
-                    SAVE {product.discountPercentage}%
-                  </span>
-                )}
-              </div>
-              <p className="text-[11px] text-silk-black/60">Inclusive of all handcrafted luxury taxes & Silk Mark certification.</p>
-            </div>
-
-            {/* Color Swatch Options */}
-            {product.colors && product.colors.length > 0 && (
-              <div className="space-y-2">
-                <span className="text-xs font-serif font-bold text-silk-black block">
-                  Color Option: <span className="font-sans font-normal text-silk-maroon">{selectedColor}</span>
-                </span>
-                <div className="flex gap-2">
-                  {product.colors.map((c) => (
-                    <button
-                      key={c.name}
-                      onClick={() => setSelectedColor(c.name)}
-                      className={`w-8 h-8 rounded-full border-2 transition ${
-                        selectedColor === c.name ? "border-silk-maroon scale-110 shadow-md" : "border-silk-gold/40"
-                      }`}
-                      style={{ backgroundColor: c.hex }}
-                      title={c.name}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Custom Blouse Stitching */}
-            {product.blouseIncluded && (
-              <label className="flex items-center justify-between p-3 rounded-lg bg-silk-beige border border-silk-gold/30 cursor-pointer text-xs font-medium text-silk-black">
-                <span className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-silk-gold" /> Add Custom Tailored Blouse Stitching (+₹1,200)
-                </span>
-                <input
-                  type="checkbox"
-                  checked={customBlouse}
-                  onChange={(e) => setCustomBlouse(e.target.checked)}
-                  className="rounded accent-silk-maroon w-4 h-4"
-                />
-              </label>
-            )}
-
-            {/* Main Primary Actions */}
-            <div className="space-y-3 pt-2">
-              <div className="flex gap-3">
-                <button
-                  onClick={handleAddToCart}
-                  className={`flex-1 font-bold text-sm py-4 px-6 rounded-lg shadow-luxury transition flex items-center justify-center gap-2 ${
-                    added
-                      ? "bg-silk-emerald text-silk-ivory"
-                      : "bg-gradient-to-r from-silk-gold to-silk-gold-dark text-silk-black hover:from-silk-gold-light hover:to-silk-gold"
-                  }`}
-                >
-                  {added ? (
-                    <>
-                      <Check className="w-5 h-5" /> Added to Shopping Bag
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingBag className="w-5 h-5" /> Add to Shopping Bag
-                    </>
+                  {product.originalPrice > product.price && (
+                    <span className="text-sm text-silk-black/40 line-through">
+                      {formatPrice(product.originalPrice, currency)}
+                    </span>
                   )}
-                </button>
+                  {product.discountPercentage > 0 && (
+                    <span className="bg-silk-maroon/10 text-silk-maroon text-xs font-bold px-2 py-0.5 rounded">
+                      {product.discountPercentage}% OFF
+                    </span>
+                  )}
+                </div>
+                <p className="text-[10px] text-silk-black/50">Includes all taxes • Complimentary insured express delivery</p>
+              </div>
 
+              <div className="flex items-center gap-1 bg-silk-cream px-3 py-1.5 rounded-full border border-silk-gold/30">
+                <Star className="w-4 h-4 fill-silk-gold text-silk-gold" />
+                <span className="font-serif font-bold text-xs text-silk-black">{product.rating}</span>
+                <span className="text-[10px] text-silk-black/50">({product.reviewCount})</span>
+              </div>
+            </div>
+
+            {/* Product Specifications */}
+            <div className="grid grid-cols-2 gap-3 text-xs bg-silk-cream p-4 rounded-xl border border-silk-gold/20">
+              <div>
+                <span className="text-silk-black/50 block">SKU Code</span>
+                <span className="font-mono font-bold text-silk-black">{product.sku}</span>
+              </div>
+              <div>
+                <span className="text-silk-black/50 block">Dimensions</span>
+                <span className="font-bold text-silk-black">{product.dimensions || "5.5m Saree"}</span>
+              </div>
+              <div>
+                <span className="text-silk-black/50 block">Weaving Style</span>
+                <span className="font-bold text-silk-maroon">{product.weavingStyle}</span>
+              </div>
+              <div>
+                <span className="text-silk-black/50 block">Inventory Stock</span>
+                <span className={`font-bold ${product.stock <= 5 ? "text-amber-600" : "text-silk-emerald"}`}>
+                  {product.stock} units in stock
+                </span>
+              </div>
+            </div>
+
+            {/* Custom Blouse Stitching Add-on */}
+            <div className="bg-silk-cream p-4 rounded-xl border border-silk-gold/20 space-y-2">
+              <label className="flex items-center justify-between cursor-pointer">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={customBlouse}
+                    onChange={(e) => setCustomBlouse(e.target.checked)}
+                    className="rounded accent-silk-maroon"
+                  />
+                  <span className="font-serif font-bold text-xs text-silk-black uppercase">
+                    Custom Master Tailor Blouse Stitching (+₹1,500)
+                  </span>
+                </div>
+              </label>
+              <p className="text-[11px] text-silk-black/60 pl-6">
+                Our in-house Sualkuchi tailors will stitch a custom blouse padded with silk lining tailored to your measurements.
+              </p>
+            </div>
+
+            {/* Actions (Add to Bag, Wishlist, Compare) */}
+            <div className="space-y-3 pt-2">
+              <button
+                onClick={handleAddToCart}
+                className={`w-full font-bold text-xs uppercase tracking-widest py-4 px-6 rounded-xl shadow-luxury transition flex items-center justify-center gap-2 ${
+                  added ? "bg-silk-emerald text-silk-ivory" : "bg-silk-maroon text-silk-gold hover:bg-silk-maroon-dark"
+                }`}
+              >
+                {added ? (
+                  <>
+                    <Check className="w-4 h-4" /> Added to Shopping Bag
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag className="w-4 h-4" /> Add to Shopping Bag
+                  </>
+                )}
+              </button>
+
+              <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => toggleWishlist(product)}
-                  className={`p-4 rounded-lg border transition ${
+                  className={`py-3 px-4 rounded-lg text-xs font-serif uppercase tracking-wider font-bold border transition flex items-center justify-center gap-2 ${
                     isInWishlist(product.id)
-                      ? "bg-silk-maroon text-silk-ivory border-silk-maroon"
-                      : "bg-silk-ivory text-silk-maroon border-silk-gold/40 hover:border-silk-maroon"
+                      ? "bg-silk-maroon text-silk-gold border-silk-maroon"
+                      : "bg-silk-ivory text-silk-black border-silk-gold/30 hover:border-silk-gold"
                   }`}
-                  title="Add to Wishlist"
                 >
-                  <Heart className="w-5 h-5 fill-current" />
+                  <Heart className={`w-4 h-4 ${isInWishlist(product.id) ? "fill-current" : ""}`} /> Wishlist
                 </button>
 
                 <button
                   onClick={() => addToCompare(product)}
-                  className={`p-4 rounded-lg border transition ${
+                  className={`py-3 px-4 rounded-lg text-xs font-serif uppercase tracking-wider font-bold border transition flex items-center justify-center gap-2 ${
                     isInCompare(product.id)
                       ? "bg-silk-emerald text-silk-ivory border-silk-emerald"
-                      : "bg-silk-ivory text-silk-maroon border-silk-gold/40 hover:border-silk-maroon"
+                      : "bg-silk-ivory text-silk-black border-silk-gold/30 hover:border-silk-gold"
                   }`}
-                  title="Compare Specs"
                 >
-                  <SlidersHorizontal className="w-5 h-5" />
+                  <SlidersHorizontal className="w-4 h-4" /> Compare
                 </button>
               </div>
-
-              <Link
-                href="/checkout"
-                onClick={() => addToCart(product)}
-                className="w-full block text-center bg-silk-maroon text-silk-gold hover:bg-silk-maroon-dark font-bold text-sm py-3.5 px-6 rounded-lg shadow transition"
-              >
-                Buy Now with Express Delivery
-              </Link>
             </div>
 
             {/* PIN Code Delivery Estimator */}
-            <div className="bg-silk-cream p-4 rounded-xl border border-silk-gold/30 space-y-2">
-              <span className="text-xs font-serif font-bold text-silk-black flex items-center gap-1.5">
-                <Truck className="w-4 h-4 text-silk-gold" /> Check Delivery Estimate
-              </span>
+            <div className="bg-silk-cream p-4 rounded-xl border border-silk-gold/20 space-y-3">
+              <label className="font-serif font-bold text-xs text-silk-maroon uppercase flex items-center gap-1.5">
+                <Truck className="w-4 h-4 text-silk-gold" /> Check Delivery & Pincode Speed
+              </label>
               <form onSubmit={handleCheckDelivery} className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Enter 6-digit PIN code (e.g. 781005)"
+                  placeholder="Enter 6-digit Pincode (e.g. 781001)"
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value)}
                   maxLength={6}
-                  className="flex-1 text-xs px-3 py-2 border border-silk-gold/30 rounded bg-silk-ivory focus:outline-none focus:border-silk-gold"
+                  className="flex-1 bg-silk-ivory border border-silk-gold/30 rounded px-3 py-2 text-xs focus:outline-none"
                 />
                 <button
                   type="submit"
-                  className="bg-silk-maroon text-silk-gold font-bold text-xs px-4 py-2 rounded"
+                  className="bg-silk-maroon text-silk-gold font-bold text-xs uppercase tracking-wider px-4 py-2 rounded"
                 >
                   Check
                 </button>
               </form>
-              {deliveryResult && (
-                <p className="text-xs font-semibold text-silk-emerald pt-1">
-                  🚚 Expected Delivery: <span className="font-bold">{deliveryResult.dateString}</span>
-                </p>
-              )}
-            </div>
 
-            {/* Specs & Attributes */}
-            <div className="text-xs space-y-1.5 pt-2 border-t border-silk-gold/20 text-silk-black/80">
-              <div className="flex justify-between">
-                <span className="font-bold">SKU Code:</span>
-                <span>{product.sku}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-bold">Loom Origin:</span>
-                <span>{product.stateOrigin}</span>
-              </div>
-              {product.dimensions && (
-                <div className="flex justify-between">
-                  <span className="font-bold">Dimensions:</span>
-                  <span>{product.dimensions}</span>
-                </div>
-              )}
-              {product.weight && (
-                <div className="flex justify-between">
-                  <span className="font-bold">Garment Weight:</span>
-                  <span>{product.weight}</span>
+              {deliveryResult && (
+                <div className="text-xs font-semibold text-silk-emerald pt-1">
+                  ✓ Delivery available by {deliveryResult.dateString} via Insured Express Courier.
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Tabbed Product Details: Description, Craft, Care, Reviews */}
-        <div className="bg-silk-cream rounded-2xl border border-silk-gold/30 overflow-hidden shadow-card">
-          <div className="flex border-b border-silk-gold/30 bg-silk-beige overflow-x-auto">
+        {/* Product Details Tabs (Description, Craft, Care, Reviews) */}
+        <div className="bg-silk-ivory rounded-2xl border border-silk-gold/20 p-8 shadow-card space-y-6">
+          <div className="flex border-b border-silk-gold/20 gap-8 font-serif text-xs uppercase tracking-widest font-bold">
             {[
-              { id: "desc", label: "Product Story & Description" },
-              { id: "craft", label: "Sualkuchi Heritage Craft" },
-              { id: "care", label: "Silk Care Instructions" },
-              { id: "reviews", label: `Reviews (${product.reviewCount})` },
+              { id: "desc", label: "Craftsmanship & Description" },
+              { id: "craft", label: "Heritage Loom Story" },
+              { id: "care", label: "Silk Maintenance" },
+              { id: "reviews", label: `Patron Reviews (${product.reviews.length})` },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`py-4 px-6 font-serif text-xs font-bold uppercase tracking-wider transition border-b-2 flex-shrink-0 ${
+                className={`pb-3 transition border-b-2 ${
                   activeTab === tab.id
-                    ? "border-silk-maroon text-silk-maroon bg-silk-ivory"
-                    : "border-transparent text-silk-black/60 hover:text-silk-maroon"
+                    ? "border-silk-maroon text-silk-maroon font-extrabold"
+                    : "border-transparent text-silk-black/50 hover:text-silk-black"
                 }`}
               >
                 {tab.label}
@@ -354,65 +356,39 @@ export default function ProductDetailPage() {
             ))}
           </div>
 
-          <div className="p-8 text-silk-black">
-            {activeTab === "desc" && (
-              <div className="space-y-4 text-xs sm:text-sm leading-relaxed max-w-3xl">
-                <h3 className="font-serif text-lg font-bold text-silk-maroon">{product.title}</h3>
-                <p>{product.description}</p>
-                <div className="p-4 bg-silk-ivory rounded-lg border border-silk-gold/20 italic font-serif text-silk-gold-dark">
-                  "{product.story}"
-                </div>
-              </div>
-            )}
-
-            {activeTab === "craft" && (
-              <div className="space-y-4 text-xs sm:text-sm leading-relaxed max-w-3xl">
-                <h3 className="font-serif text-lg font-bold text-silk-maroon">Sualkuchi Handloom Technique</h3>
-                <p>
-                  Handwoven by master artisans using traditional wooden throw-shuttle looms in Sualkuchi, Assam. Each motif—including the Kingkhap royal crown and Kaziranga peacock—requires manual loom programming without automated machinery.
-                </p>
-                <div className="flex items-center gap-2 text-silk-emerald font-bold text-xs">
-                  <ShieldCheck className="w-5 h-5 text-silk-gold" /> Includes Official SMOI Silk Mark Hologram Tag
-                </div>
-              </div>
-            )}
-
+          <div className="pt-2 text-xs sm:text-sm text-silk-black/80 leading-relaxed font-sans">
+            {activeTab === "desc" && <p>{product.description}</p>}
+            {activeTab === "craft" && <p>{product.story || "Handwoven in Sualkuchi by generational master weavers."}</p>}
             {activeTab === "care" && (
-              <div className="space-y-2 text-xs sm:text-sm max-w-3xl">
-                <h3 className="font-serif text-lg font-bold text-silk-maroon mb-2">Garment Maintenance Protocol</h3>
-                <ul className="list-disc pl-5 space-y-1 text-silk-black/80">
-                  {(product.careInstructions || [
-                    "Dry clean only by pure silk specialist",
-                    "Store wrapped in breathable un-dyed muslin cloth",
-                    "Press on low silk heat with protective press cloth",
-                  ]).map((ci, i) => (
-                    <li key={i}>{ci}</li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="list-disc pl-5 space-y-1">
+                {(product.careInstructions || [
+                  "Dry clean only by pure silk specialist",
+                  "Store wrapped in breathable un-dyed muslin cloth",
+                  "Press on low silk heat with protective press cloth",
+                ]).map((ci, i) => (
+                  <li key={i}>{ci}</li>
+                ))}
+              </ul>
             )}
-
             {activeTab === "reviews" && (
-              <div className="space-y-6 max-w-3xl">
-                <h3 className="font-serif text-lg font-bold text-silk-maroon">Verified Customer Reviews</h3>
-                {product.reviews && product.reviews.length > 0 ? (
-                  product.reviews.map((rev) => (
-                    <div key={rev.id} className="p-4 bg-silk-ivory rounded-lg border border-silk-gold/20 space-y-2">
+              <div className="space-y-4">
+                {product.reviews.length === 0 ? (
+                  <p className="italic text-silk-black/60">No reviews yet for this masterpiece. Be the first to leave a review!</p>
+                ) : (
+                  product.reviews.map((r, i) => (
+                    <div key={i} className="bg-silk-cream p-4 rounded-xl border border-silk-gold/20 space-y-1">
                       <div className="flex items-center justify-between">
-                        <span className="font-serif font-bold text-xs text-silk-black">{rev.userName}</span>
-                        <span className="text-[10px] text-silk-black/50">{rev.date}</span>
+                        <span className="font-serif font-bold text-silk-maroon">{r.userName}</span>
+                        <div className="flex text-silk-gold text-xs">
+                          {[...Array(r.rating || 5)].map((_, idx) => (
+                            <Star key={idx} className="w-3.5 h-3.5 fill-current" />
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex text-silk-gold">
-                        {[...Array(rev.rating)].map((_, i) => (
-                          <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                        ))}
-                      </div>
-                      <h4 className="font-serif font-bold text-xs text-silk-maroon">{rev.title}</h4>
-                      <p className="text-xs text-silk-black/80">{rev.comment}</p>
+                      <h4 className="font-bold text-xs text-silk-black">{r.title}</h4>
+                      <p className="text-xs text-silk-black/70">{r.comment}</p>
                     </div>
                   ))
-                ) : (
-                  <p className="text-xs text-silk-black/60">No reviews written yet. Be the first patron to review!</p>
                 )}
               </div>
             )}
@@ -421,33 +397,22 @@ export default function ProductDetailPage() {
 
         {/* Related Products Carousel */}
         <div className="space-y-6">
-          <h2 className="font-serif text-2xl font-bold text-silk-maroon">You May Also Admire</h2>
+          <div className="border-b border-silk-gold/20 pb-4">
+            <span className="text-[10px] font-serif font-bold tracking-[0.3em] text-silk-gold-dark uppercase block">
+              YOU MAY ALSO ADMIRE
+            </span>
+            <h2 className="font-serif text-2xl font-bold text-silk-maroon uppercase tracking-wide">
+              Complementary Silk Masterpieces
+            </h2>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {relatedProducts.map((rp) => (
-              <ProductCard key={rp.id} product={rp} />
+            {relatedProducts.slice(0, 4).map((rel) => (
+              <ProductCard key={rel.id} product={rel} />
             ))}
           </div>
         </div>
       </div>
-
-      {/* Loom Video Modal */}
-      {isVideoModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-silk-ivory rounded-xl p-4 max-w-2xl w-full text-center space-y-4">
-            <h3 className="font-serif font-bold text-lg text-silk-maroon">Sualkuchi Loom Weaving Video</h3>
-            <div className="aspect-video bg-silk-black rounded overflow-hidden flex items-center justify-center text-silk-gold">
-              <Play className="w-12 h-12 animate-pulse" />
-              <span className="text-xs font-serif ml-2">Playing Loom Demonstration Video</span>
-            </div>
-            <button
-              onClick={() => setIsVideoModalOpen(false)}
-              className="bg-silk-maroon text-silk-gold font-bold text-xs px-6 py-2 rounded"
-            >
-              Close Video
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

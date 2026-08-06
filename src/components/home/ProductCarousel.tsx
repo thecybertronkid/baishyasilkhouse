@@ -1,26 +1,82 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { PRODUCTS } from "@/data/products";
 import { ProductCard } from "../shop/ProductCard";
 import { ArrowRight } from "lucide-react";
+import { Product } from "@/types";
 
 export const ProductCarousel = () => {
   const [activeTab, setActiveTab] = useState<"best" | "new" | "trending" | "bridal">("best");
+  const [liveProducts, setLiveProducts] = useState<Product[]>(PRODUCTS);
+
+  useEffect(() => {
+    const fetchLiveProducts = async () => {
+      try {
+        const res = await fetch("/api/products");
+        const data = await res.json();
+        if (data.success && data.products && data.products.length > 0) {
+          const formattedDbProducts: Product[] = data.products.map((p: any) => ({
+            id: p.id,
+            slug: p.slug,
+            title: p.title,
+            tagline: p.tagline,
+            subtitle: p.subtitle,
+            price: p.price,
+            originalPrice: p.originalPrice || p.price,
+            discountPercentage: p.discountPercentage || 0,
+            category: p.category,
+            silkType: p.silkType,
+            weavingStyle: p.weavingStyle || "Handloom",
+            occasion: p.occasion || "Bridal",
+            stateOrigin: p.stateOrigin || "Sualkuchi, Assam",
+            rating: p.rating || 5.0,
+            reviewCount: p.reviewCount || 0,
+            sku: p.sku,
+            stock: p.stock || 10,
+            inStock: p.inStock ?? true,
+            isSilkMarkCertified: p.isSilkMarkCertified ?? true,
+            isBestSeller: p.isBestSeller ?? false,
+            isNewArrival: p.isNewArrival ?? true,
+            isTrending: p.isTrending ?? false,
+            isBridal: p.isBridal ?? false,
+            description: p.description,
+            story: p.story,
+            images: p.images?.length > 0 ? p.images.map((img: any) => img.url) : ["https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=1200"],
+            colors: p.colors || [{ name: "Standard", hex: "#D4AF37" }],
+            reviews: p.reviews || [],
+          }));
+
+          const combined = [...formattedDbProducts];
+          PRODUCTS.forEach((staticProd) => {
+            if (!combined.some((p) => p.id === staticProd.id || p.slug === staticProd.slug)) {
+              combined.push(staticProd);
+            }
+          });
+
+          setLiveProducts(combined);
+        }
+      } catch (err) {
+        console.error("Error loading products for home carousel:", err);
+      }
+    };
+
+    fetchLiveProducts();
+  }, []);
 
   const getFilteredProducts = () => {
     switch (activeTab) {
       case "best":
-        return PRODUCTS.filter((p) => p.isBestSeller);
+        return liveProducts.filter((p) => p.isBestSeller || p.inStock);
       case "new":
-        return PRODUCTS.filter((p) => p.isNewArrival);
+        return liveProducts.filter((p) => p.isNewArrival || p.inStock);
       case "trending":
-        return PRODUCTS.filter((p) => p.isTrending);
+        return liveProducts.filter((p) => p.isTrending || p.inStock);
       case "bridal":
-        return PRODUCTS.filter((p) => p.isBridal);
+        return liveProducts.filter((p) => p.isBridal || p.category === "Silk Sarees");
       default:
-        return PRODUCTS;
+        return liveProducts;
     }
   };
 
@@ -40,7 +96,7 @@ export const ProductCarousel = () => {
             </h2>
           </div>
 
-          {/* Clean Underlined Navigation Tabs */}
+          {/* Underlined Navigation Tabs */}
           <div className="flex flex-wrap gap-6 font-serif text-xs uppercase tracking-widest font-bold">
             {[
               { key: "best", label: "Best Sellers" },
@@ -76,7 +132,7 @@ export const ProductCarousel = () => {
             href="/shop"
             className="inline-flex items-center gap-2 border border-silk-maroon text-silk-maroon hover:bg-silk-maroon hover:text-silk-gold font-bold text-xs uppercase tracking-widest py-3.5 px-8 rounded transition duration-300"
           >
-            Explore Complete Catalog ({PRODUCTS.length} Masterpieces) <ArrowRight className="w-4 h-4" />
+            Explore Complete Catalog ({liveProducts.length} Masterpieces) <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>
