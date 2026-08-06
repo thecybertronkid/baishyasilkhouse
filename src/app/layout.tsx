@@ -15,7 +15,6 @@ import { MobileNav } from "@/components/layout/MobileNav";
 import { CartDrawer } from "@/components/layout/CartDrawer";
 import { SearchModal } from "@/components/layout/SearchModal";
 import { QuickViewModal } from "@/components/layout/QuickViewModal";
-import { SilkAdvisorModal } from "@/components/ai/SilkAdvisorModal";
 import { FloatingWhatsapp } from "@/components/layout/FloatingWhatsapp";
 
 const cinzel = Cinzel({
@@ -80,7 +79,6 @@ export default function RootLayout({
                   <CartDrawer />
                   <SearchModal />
                   <QuickViewModal />
-                  <SilkAdvisorModal />
                   <FloatingWhatsapp />
                 </CompareProvider>
               </WishlistProvider>

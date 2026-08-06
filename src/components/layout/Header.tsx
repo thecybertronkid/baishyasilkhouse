@@ -8,11 +8,9 @@ import {
   ShoppingBag,
   User,
   SlidersHorizontal,
-  Sparkles,
   ChevronDown,
   Menu,
   X,
-  Compass,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -30,7 +28,7 @@ export const Header = () => {
   const { wishlistCount } = useWishlist();
   const { compareList } = useCompare();
   const { user } = useAuth();
-  const { setIsSearchOpen, setIsAiAdvisorOpen } = useStore();
+  const { setIsSearchOpen } = useStore();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -107,16 +105,6 @@ export const Header = () => {
 
         {/* Utility Icon Actions */}
         <div className="flex items-center space-x-3 sm:space-x-4">
-          {/* AI Silk Specialist Button */}
-          <button
-            onClick={() => setIsAiAdvisorOpen(true)}
-            className="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-silk-gold/20 to-silk-maroon/10 border border-silk-gold/40 text-silk-maroon hover:border-silk-gold font-sans text-xs font-bold px-2.5 py-1.5 rounded-full transition shadow-sm"
-            title="Interactive Silk Advisor"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-silk-gold" />
-            <span className="hidden md:inline">Silk Advisor</span>
-          </button>
-
           {/* Search Trigger */}
           <button
             onClick={() => setIsSearchOpen(true)}
@@ -235,15 +223,6 @@ export const Header = () => {
             </div>
 
             <div className="pt-6 border-t border-silk-gold/30 text-center space-y-3">
-              <button
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  setIsAiAdvisorOpen(true);
-                }}
-                className="w-full bg-silk-gold text-silk-black font-bold py-2.5 rounded text-sm flex items-center justify-center gap-2"
-              >
-                <Sparkles className="w-4 h-4 text-silk-maroon" /> Open AI Silk Advisor
-              </button>
               <p className="text-xs text-silk-black/60">
                 Certified 100% Pure Silk Mark • Sualkuchi Assam
               </p>

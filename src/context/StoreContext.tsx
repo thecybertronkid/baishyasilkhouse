@@ -8,8 +8,6 @@ interface StoreContextType {
   setCurrency: (c: "INR" | "USD") => void;
   quickViewProduct: Product | null;
   setQuickViewProduct: (p: Product | null) => void;
-  isAiAdvisorOpen: boolean;
-  setIsAiAdvisorOpen: (open: boolean) => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
   isSearchOpen: boolean;
@@ -21,7 +19,6 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currency, setCurrency] = useState<"INR" | "USD">("INR");
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
-  const [isAiAdvisorOpen, setIsAiAdvisorOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -32,8 +29,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setCurrency,
         quickViewProduct,
         setQuickViewProduct,
-        isAiAdvisorOpen,
-        setIsAiAdvisorOpen,
         searchQuery,
         setSearchQuery,
         isSearchOpen,
