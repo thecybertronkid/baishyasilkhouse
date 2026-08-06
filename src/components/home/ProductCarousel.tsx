@@ -24,37 +24,37 @@ export const ProductCarousel = () => {
     }
   };
 
-  const productsList = getFilteredProducts();
+  const productsList = getFilteredProducts().slice(0, 4);
 
   return (
-    <section className="py-20 bg-silk-cream">
+    <section className="py-24 bg-silk-ivory">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header & Tabs */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 border-b border-silk-gold/30 pb-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-silk-gold/20 pb-6">
           <div className="space-y-2">
-            <span className="text-xs font-serif font-bold tracking-[0.25em] text-silk-gold-dark uppercase block">
-              HERITAGE LOOMS
+            <span className="text-[10px] font-serif font-bold tracking-[0.3em] text-silk-gold-dark uppercase block">
+              CURATED SELECTION
             </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-silk-maroon">
-              Curated Silk Collection
+            <h2 className="font-serif text-3xl font-bold text-silk-maroon uppercase tracking-wide">
+              Patron Favorites
             </h2>
           </div>
 
-          {/* Navigation Tabs */}
-          <div className="flex flex-wrap gap-2 font-serif text-xs uppercase tracking-wider font-bold">
+          {/* Clean Underlined Navigation Tabs */}
+          <div className="flex flex-wrap gap-6 font-serif text-xs uppercase tracking-widest font-bold">
             {[
               { key: "best", label: "Best Sellers" },
               { key: "new", label: "New Arrivals" },
-              { key: "trending", label: "Trending Now" },
+              { key: "trending", label: "Trending" },
               { key: "bridal", label: "Bridal Silk" },
             ].map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as any)}
-                className={`px-4 py-2 rounded-full border transition ${
+                className={`pb-2 transition border-b-2 ${
                   activeTab === tab.key
-                    ? "bg-silk-maroon text-silk-gold border-silk-maroon shadow"
-                    : "bg-silk-ivory text-silk-black/70 border-silk-gold/30 hover:border-silk-gold"
+                    ? "border-silk-maroon text-silk-maroon"
+                    : "border-transparent text-silk-black/50 hover:text-silk-black"
                 }`}
               >
                 {tab.label}
@@ -64,19 +64,19 @@ export const ProductCarousel = () => {
         </div>
 
         {/* Product Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {productsList.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
 
         {/* View All Link */}
-        <div className="mt-12 text-center">
+        <div className="mt-16 text-center">
           <Link
             href="/shop"
-            className="inline-flex items-center gap-2 bg-silk-gold text-silk-black hover:bg-silk-gold-light font-bold text-xs uppercase tracking-widest py-3 px-8 rounded shadow-md transition"
+            className="inline-flex items-center gap-2 border border-silk-maroon text-silk-maroon hover:bg-silk-maroon hover:text-silk-gold font-bold text-xs uppercase tracking-widest py-3.5 px-8 rounded transition duration-300"
           >
-            Explore Complete Shop Catalog ({PRODUCTS.length} Items) <ArrowRight className="w-4 h-4" />
+            Explore Complete Catalog ({PRODUCTS.length} Masterpieces) <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>
