@@ -17,7 +17,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const DEFAULT_USER: UserProfile = {
   id: "usr-001",
   name: "Rajkumari Ananya Baishya",
-  email: "ananya.baishya@example.com",
+  email: "ananya@baishyasilk.com",
   phone: "+91 98640 12345",
   role: "admin",
   loyaltyPoints: 2450,

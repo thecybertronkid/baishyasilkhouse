@@ -19,7 +19,7 @@ export default function CheckoutPage() {
   // Address State
   const [formData, setFormData] = useState({
     fullName: user ? user.name : "Ananya Baishya",
-    email: user ? user.email : "ananya@example.com",
+    email: user ? user.email : "ananya@baishyasilk.com",
     phone: user ? user.phone : "+91 98640 12345",
     street: "House No 42, GS Road, Christian Basti",
     city: "Guwahati",
