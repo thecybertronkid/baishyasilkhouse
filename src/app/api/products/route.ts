@@ -40,6 +40,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const {
       title,
+      tagline,
+      subtitle,
       price,
       originalPrice,
       stock,
@@ -49,41 +51,59 @@ export async function POST(request: Request) {
       weavingStyle,
       occasion,
       stateOrigin,
+      dimensions,
+      weight,
       description,
-      imageUrl,
+      story,
+      images, // array of base64 data URLs or image URLs
       isSilkMarkCertified,
       isBestSeller,
+      isNewArrival,
       isBridal,
+      blouseIncluded,
     } = body;
 
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    const sellingPrice = parseFloat(price);
+    const comparePrice = parseFloat(originalPrice || price);
+    const discount = comparePrice > sellingPrice ? Math.round(((comparePrice - sellingPrice) / comparePrice) * 100) : 0;
+    const slugBase = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+
+    const imageList = Array.isArray(images) && images.length > 0
+      ? images.map((url: string, index: number) => ({ url, isPrimary: index === 0 }))
+      : [{ url: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=1200", isPrimary: true }];
 
     const product = await prisma.product.create({
       data: {
         title,
-        slug: `${slug}-${Math.floor(1000 + Math.random() * 9000)}`,
-        price: parseFloat(price),
-        originalPrice: parseFloat(originalPrice || price),
-        stock: parseInt(stock, 10),
-        inStock: parseInt(stock, 10) > 0,
+        slug: `${slugBase}-${Math.floor(1000 + Math.random() * 9000)}`,
+        tagline: tagline || "Handwoven Sualkuchi Heritage",
+        subtitle: subtitle || "100% Pure Indian Silk",
+        price: sellingPrice,
+        originalPrice: comparePrice,
+        discountPercentage: discount,
+        stock: parseInt(stock, 10) || 10,
+        inStock: (parseInt(stock, 10) || 10) > 0,
         sku: sku || `BSH-SKU-${Math.floor(1000 + Math.random() * 9000)}`,
         category: category || "Silk Sarees",
         silkType: silkType || "Muga Silk",
         weavingStyle: weavingStyle || "Handloom Jacquard",
-        occasion: occasion || "Festive",
+        occasion: occasion || "Bridal",
         stateOrigin: stateOrigin || "Sualkuchi, Assam",
-        description: description || "Authentic 100% pure Indian silk handwoven by master artisans.",
+        dimensions: dimensions || "Saree: 5.5m x 1.15m | Blouse: 0.9m",
+        weight: weight || "750 grams",
+        description: description || "Handcrafted from 100% pure silk yarns by master weavers in Sualkuchi.",
+        story: story || "Woven with generational handloom artistry.",
         isSilkMarkCertified: isSilkMarkCertified ?? true,
         isBestSeller: isBestSeller ?? false,
+        isNewArrival: isNewArrival ?? true,
         isBridal: isBridal ?? false,
+        blouseIncluded: blouseIncluded ?? true,
         images: {
-          create: [
-            {
-              url: imageUrl || "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=1200",
-              isPrimary: true,
-            },
-          ],
+          create: imageList,
         },
+      },
+      include: {
+        images: true,
       },
     });
 
@@ -96,12 +116,13 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
-    const { id, price, stock, isBestSeller, isBridal } = body;
+    const { id, price, originalPrice, stock, isBestSeller, isBridal } = body;
 
     const product = await prisma.product.update({
       where: { id },
       data: {
         ...(price !== undefined && { price: parseFloat(price) }),
+        ...(originalPrice !== undefined && { originalPrice: parseFloat(originalPrice) }),
         ...(stock !== undefined && {
           stock: parseInt(stock, 10),
           inStock: parseInt(stock, 10) > 0,
