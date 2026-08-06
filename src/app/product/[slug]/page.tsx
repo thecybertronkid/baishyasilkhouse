@@ -381,7 +381,11 @@ export default function ProductDetailPage() {
               <div className="space-y-2 text-xs sm:text-sm max-w-3xl">
                 <h3 className="font-serif text-lg font-bold text-silk-maroon mb-2">Garment Maintenance Protocol</h3>
                 <ul className="list-disc pl-5 space-y-1 text-silk-black/80">
-                  {product.careInstructions.map((ci, i) => (
+                  {(product.careInstructions || [
+                    "Dry clean only by pure silk specialist",
+                    "Store wrapped in breathable un-dyed muslin cloth",
+                    "Press on low silk heat with protective press cloth",
+                  ]).map((ci, i) => (
                     <li key={i}>{ci}</li>
                   ))}
                 </ul>

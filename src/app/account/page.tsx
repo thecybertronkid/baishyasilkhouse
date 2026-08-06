@@ -169,8 +169,8 @@ export default function AccountPage() {
                     </div>
 
                     <div className="space-y-2">
-                      {ord.items.map((item) => (
-                        <div key={item.id} className="flex items-center gap-3 text-xs">
+                      {ord.items.map((item: any, idx: number) => (
+                        <div key={item.id || idx} className="flex items-center gap-3 text-xs">
                           <img src={item.image} alt="" className="w-12 h-14 object-cover rounded border" />
                           <div className="flex-1">
                             <h4 className="font-bold text-silk-black">{item.title}</h4>
