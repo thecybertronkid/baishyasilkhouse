@@ -21,7 +21,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { totalAmount, paymentMethod, items, shippingAddress } = body;
+    const { totalAmount, paymentMethod, items } = body;
 
     const orderNumber = `BSH-2026-${Math.floor(1000 + Math.random() * 9000)}`;
 
@@ -29,21 +29,42 @@ export async function POST(request: Request) {
       data: {
         orderNumber,
         totalAmount: parseFloat(totalAmount),
-        paymentMethod,
+        paymentMethod: paymentMethod || "Razorpay Online",
         trackingNumber: `DEL-${Math.floor(100000 + Math.random() * 900000)}IN`,
         estimatedDelivery: "3-5 Business Days",
+        status: "PROCESSING",
         items: {
-          create: items.map((item: any) => ({
-            productId: item.productId,
+          create: (items || []).map((item: any) => ({
+            productId: item.productId || item.id,
             title: item.title,
-            image: item.image,
-            price: item.price,
-            quantity: item.quantity,
-            color: item.color,
-            customBlouse: item.customBlouse || false,
+            image: item.image || item.images?.[0],
+            price: parseFloat(item.price),
+            quantity: parseInt(item.quantity, 10),
+            color: item.color || "Standard",
           })),
         },
       },
+      include: { items: true },
+    });
+
+    return NextResponse.json({ success: true, order });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, status, trackingNumber } = body;
+
+    const order = await prisma.order.update({
+      where: { id },
+      data: {
+        ...(status && { status }),
+        ...(trackingNumber && { trackingNumber }),
+      },
+      include: { items: true },
     });
 
     return NextResponse.json({ success: true, order });

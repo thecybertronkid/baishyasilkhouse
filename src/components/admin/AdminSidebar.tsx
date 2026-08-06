@@ -2,71 +2,72 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
   ShoppingBag,
-  Ticket,
-  Image as ImageIcon,
+  Tag,
+  FileText,
   Settings,
-  ArrowLeft,
-  Users,
-  Star,
+  Store,
 } from "lucide-react";
 
-export const AdminSidebar = () => {
-  const pathname = usePathname();
-
-  const links = [
-    { href: "/admin", label: "Dashboard Overview", icon: LayoutDashboard },
-    { href: "/admin/products", label: "Products Catalog", icon: Package },
-    { href: "/admin/orders", label: "Orders Fulfillment", icon: ShoppingBag },
-    { href: "/admin/coupons", label: "Discount Coupons", icon: Ticket },
-    { href: "/admin/cms", label: "CMS & Banners", icon: ImageIcon },
-    { href: "/admin/settings", label: "Store Settings", icon: Settings },
+export const AdminSidebar: React.FC<{ activeTab?: string }> = ({ activeTab = "dashboard" }) => {
+  const menuItems = [
+    { key: "dashboard", label: "Executive Dashboard", href: "/admin", icon: LayoutDashboard },
+    { key: "products", label: "Inventory SKUs", href: "/admin/products", icon: Package },
+    { key: "orders", label: "Order Dispatch", href: "/admin/orders", icon: ShoppingBag },
+    { key: "coupons", label: "Promotions & Discounts", href: "/admin/coupons", icon: Tag },
+    { key: "cms", label: "CMS & Banners", href: "/admin/cms", icon: FileText },
+    { key: "settings", label: "Store Settings", href: "/admin/settings", icon: Settings },
   ];
 
   return (
-    <aside className="w-full lg:w-64 bg-silk-maroon text-silk-ivory p-6 flex flex-col justify-between rounded-2xl shadow-2xl border border-silk-gold/40 font-sans">
-      <div className="space-y-6">
-        <div className="border-b border-silk-gold/30 pb-4">
-          <span className="text-[10px] font-serif font-bold text-silk-gold uppercase tracking-[0.25em] block">
-            ADMINISTRATOR CONTROL
-          </span>
-          <h2 className="font-serif text-xl font-extrabold text-silk-gold-light mt-1">
-            Baishya Atelier HQ
-          </h2>
+    <aside className="w-64 bg-silk-maroon text-silk-ivory min-h-screen p-6 hidden md:flex flex-col justify-between flex-shrink-0 border-r border-silk-gold/30">
+      <div className="space-y-8">
+        {/* Admin Brand */}
+        <div className="border-b border-silk-gold/20 pb-4">
+          <Link href="/admin" className="block text-center space-y-1">
+            <span className="font-serif font-bold text-lg tracking-[0.2em] text-silk-gold block uppercase">
+              BAISHYA SILK
+            </span>
+            <span className="text-[9px] uppercase tracking-[0.25em] text-silk-ivory/60 block font-medium">
+              SHOPIFY ADMIN PORTAL
+            </span>
+          </Link>
         </div>
 
-        <nav className="space-y-1 font-serif text-xs uppercase font-bold tracking-wider">
-          {links.map((link) => {
-            const Icon = link.icon;
-            const active = pathname === link.href;
+        {/* Navigation Menu */}
+        <nav className="space-y-1 font-serif text-xs uppercase tracking-wider font-semibold">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.key;
             return (
               <Link
-                key={link.href}
-                href={link.href}
-                className={`flex items-center gap-3 p-3 rounded-lg transition ${
-                  active
-                    ? "bg-silk-gold text-silk-black shadow-md font-extrabold"
-                    : "text-silk-gold-light/80 hover:bg-silk-maroon-dark hover:text-silk-gold"
+                key={item.key}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                  isActive
+                    ? "bg-silk-gold text-silk-black font-extrabold shadow"
+                    : "text-silk-ivory/80 hover:bg-silk-maroon-dark hover:text-silk-gold"
                 }`}
               >
-                <Icon className="w-4 h-4" />
-                <span>{link.label}</span>
+                <Icon className={`w-4 h-4 ${isActive ? "text-silk-black" : "text-silk-gold"}`} />
+                <span>{item.label}</span>
               </Link>
             );
           })}
         </nav>
       </div>
 
+      {/* Back to Live Storefront */}
       <div className="pt-6 border-t border-silk-gold/20">
         <Link
           href="/"
-          className="flex items-center justify-center gap-2 text-xs font-bold text-silk-gold hover:underline bg-silk-maroon-dark/60 p-2.5 rounded border border-silk-gold/30"
+          target="_blank"
+          className="flex items-center justify-center gap-2 bg-silk-gold text-silk-black hover:bg-silk-gold-light text-xs font-bold uppercase tracking-wider py-3 rounded shadow transition"
         >
-          <ArrowLeft className="w-3.5 h-3.5" /> Back to Storefront
+          <Store className="w-4 h-4" /> Live Storefront
         </Link>
       </div>
     </aside>
