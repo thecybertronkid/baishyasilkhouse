@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
@@ -10,16 +11,29 @@ import {
   FileText,
   Settings,
   Store,
+  LogOut,
 } from "lucide-react";
+import { useAdminAuth } from "@/context/AdminAuthContext";
 
 export const AdminSidebar: React.FC<{ activeTab?: string }> = ({ activeTab = "dashboard" }) => {
+  const router = useRouter();
+  const { isAdminLoggedIn, logoutAdmin, adminUsername } = useAdminAuth();
+
+  useEffect(() => {
+    // Redirect if not logged in
+    const storedAuth = localStorage.getItem("bsh_admin_auth") === "true";
+    if (!isAdminLoggedIn && !storedAuth) {
+      router.push("/admin/login");
+    }
+  }, [isAdminLoggedIn]);
+
   const menuItems = [
     { key: "dashboard", label: "Executive Dashboard", href: "/admin", icon: LayoutDashboard },
     { key: "products", label: "Inventory SKUs", href: "/admin/products", icon: Package },
     { key: "orders", label: "Order Dispatch", href: "/admin/orders", icon: ShoppingBag },
     { key: "coupons", label: "Promotions & Discounts", href: "/admin/coupons", icon: Tag },
     { key: "cms", label: "CMS & Banners", href: "/admin/cms", icon: FileText },
-    { key: "settings", label: "Store Settings", href: "/admin/settings", icon: Settings },
+    { key: "settings", label: "Security & Settings", href: "/admin/settings", icon: Settings },
   ];
 
   return (
@@ -32,7 +46,7 @@ export const AdminSidebar: React.FC<{ activeTab?: string }> = ({ activeTab = "da
               BAISHYA SILK
             </span>
             <span className="text-[9px] uppercase tracking-[0.25em] text-silk-ivory/60 block font-medium">
-              SHOPIFY ADMIN PORTAL
+              ADMIN PORTAL • {adminUsername.toUpperCase()}
             </span>
           </Link>
         </div>
@@ -60,15 +74,22 @@ export const AdminSidebar: React.FC<{ activeTab?: string }> = ({ activeTab = "da
         </nav>
       </div>
 
-      {/* Back to Live Storefront */}
-      <div className="pt-6 border-t border-silk-gold/20">
+      {/* Logout & Live Storefront */}
+      <div className="pt-6 border-t border-silk-gold/20 space-y-2">
         <Link
           href="/"
           target="_blank"
-          className="flex items-center justify-center gap-2 bg-silk-gold text-silk-black hover:bg-silk-gold-light text-xs font-bold uppercase tracking-wider py-3 rounded shadow transition"
+          className="flex items-center justify-center gap-2 bg-silk-gold text-silk-black hover:bg-silk-gold-light text-xs font-bold uppercase tracking-wider py-2.5 rounded shadow transition"
         >
           <Store className="w-4 h-4" /> Live Storefront
         </Link>
+
+        <button
+          onClick={logoutAdmin}
+          className="w-full flex items-center justify-center gap-2 text-silk-ivory/70 hover:text-red-400 text-xs font-bold uppercase tracking-wider py-2 transition"
+        >
+          <LogOut className="w-4 h-4" /> Logout Admin
+        </button>
       </div>
     </aside>
   );
