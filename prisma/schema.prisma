@@ -1,0 +1,195 @@
+// Baishya Silk House - Prisma Database Schema
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum MembershipTier {
+  SILVER
+  GOLD
+  PLATINUM
+  ROYAL_SILK_CIRCLE
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model User {
+  id            String         @id @default(uuid())
+  name          String
+  email         String         @unique
+  phone         String?
+  passwordHash  String?
+  role          Role           @default(CUSTOMER)
+  loyaltyPoints Int            @default(100)
+  tier          MembershipTier @default(ROYAL_SILK_CIRCLE)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  addresses Address[]
+  orders    Order[]
+  reviews   ProductReview[]
+}
+
+model Address {
+  id        String   @id @default(uuid())
+  userId    String
+  fullName  String
+  street    String
+  city      String
+  state     String
+  zipCode   String
+  country   String   @default("India")
+  phone     String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders Order[]
+}
+
+model Product {
+  id                  String   @id @default(uuid())
+  slug                String   @unique
+  title               String
+  tagline             String?
+  subtitle            String?
+  price               Float
+  originalPrice       Float
+  discountPercentage  Int      @default(0)
+  category            String
+  silkType            String
+  weavingStyle        String
+  occasion            String
+  stateOrigin         String
+  rating              Float    @default(5.0)
+  reviewCount         Int      @default(0)
+  sku                 String   @unique
+  stock               Int      @default(10)
+  inStock             Boolean  @default(true)
+  isSilkMarkCertified Boolean  @default(true)
+  isBestSeller        Boolean  @default(false)
+  isNewArrival        Boolean  @default(false)
+  isTrending          Boolean  @default(false)
+  isLimitedEdition    Boolean  @default(false)
+  isBridal            Boolean  @default(false)
+  blouseIncluded      Boolean  @default(true)
+  dimensions          String?
+  weight              String?
+  description         String
+  story               String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  images     ProductImage[]
+  colors     ProductColor[]
+  reviews    ProductReview[]
+  orderItems OrderItem[]
+}
+
+model ProductImage {
+  id        String  @id @default(uuid())
+  productId String
+  url       String
+  isPrimary Boolean @default(false)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductColor {
+  id        String @id @default(uuid())
+  productId String
+  name      String
+  hex       String
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductReview {
+  id               String   @id @default(uuid())
+  productId        String
+  userId           String?
+  userName         String
+  rating           Int
+  title            String
+  comment          String
+  verifiedPurchase Boolean  @default(true)
+  helpfulCount     Int      @default(0)
+  createdAt        DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model Order {
+  id                String      @id @default(uuid())
+  orderNumber       String      @unique
+  userId            String?
+  totalAmount       Float
+  status            OrderStatus @default(PROCESSING)
+  trackingNumber    String?
+  carrier           String?     @default("Delhivery Express")
+  estimatedDelivery String?
+  paymentMethod     String
+  paymentStatus     String      @default("PAID")
+  shippingAddressId String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  shippingAddress Address?    @relation(fields: [shippingAddressId], references: [id])
+  items           OrderItem[]
+}
+
+model OrderItem {
+  id           String   @id @default(uuid())
+  orderId      String
+  productId    String
+  title        String
+  image        String
+  price        Float
+  quantity     Int
+  color        String?
+  customBlouse Boolean  @default(false)
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Coupon {
+  id              String    @id @default(uuid())
+  code            String    @unique
+  discountPercent Int?
+  discountFlat    Float?
+  minSpend        Float?    @default(0)
+  maxUses         Int?
+  usedCount       Int       @default(0)
+  isActive        Boolean   @default(true)
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+model CMSBanner {
+  id        String   @id @default(uuid())
+  title     String
+  subtitle  String?
+  image     String
+  link      String?
+  placement String   @default("HERO")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
