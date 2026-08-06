@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { useAdminAuth } from "@/context/AdminAuthContext";
-import { KeyRound, ShieldCheck, CheckCircle2, Store, Lock, User } from "lucide-react";
+import { KeyRound, ShieldCheck, CheckCircle2, Store, Lock, User, RefreshCw } from "lucide-react";
 
 export default function AdminSettingsPage() {
   const { adminUsername, updateAdminCredentials } = useAdminAuth();
@@ -16,11 +16,32 @@ export default function AdminSettingsPage() {
   const [credErrorMsg, setCredErrorMsg] = useState("");
 
   // Store Configuration State
-  const [storeName, setStoreName] = useState("Baishya Silk House");
-  const [contactEmail, setContactEmail] = useState("concierge@baishyasilk.com");
+  const [brandName, setBrandName] = useState("Baishya Silk House");
+  const [conciergeEmail, setConciergeEmail] = useState("concierge@baishyasilk.com");
   const [supportPhone, setSupportPhone] = useState("+91 98640 12345");
   const [freeShippingThreshold, setFreeShippingThreshold] = useState("5000");
+  const [savingStore, setSavingStore] = useState(false);
   const [storeSuccessMsg, setStoreSuccessMsg] = useState("");
+
+  useEffect(() => {
+    // Fetch live store settings from database
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch("/api/admin/settings");
+        const data = await res.json();
+        if (data.success && data.settings) {
+          setBrandName(data.settings.brandName || "Baishya Silk House");
+          setConciergeEmail(data.settings.conciergeEmail || "concierge@baishyasilk.com");
+          setSupportPhone(data.settings.supportPhone || "+91 98640 12345");
+          setFreeShippingThreshold(String(data.settings.freeShippingThreshold || 5000));
+        }
+      } catch (err) {
+        console.error("Error loading store settings:", err);
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   const handleUpdateCredentials = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,10 +64,33 @@ export default function AdminSettingsPage() {
     setConfirmPassword("");
   };
 
-  const handleUpdateStoreSettings = (e: React.FormEvent) => {
+  const handleUpdateStoreSettings = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStoreSuccessMsg("Store configuration settings saved successfully!");
-    setTimeout(() => setStoreSuccessMsg(""), 3000);
+    setSavingStore(true);
+    setStoreSuccessMsg("");
+
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brandName,
+          conciergeEmail,
+          supportPhone,
+          freeShippingThreshold,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setStoreSuccessMsg("Storefront configuration saved to database and synced across the whole website!");
+        setTimeout(() => setStoreSuccessMsg(""), 4000);
+      }
+    } catch (err) {
+      console.error("Error saving store settings:", err);
+    } finally {
+      setSavingStore(false);
+    }
   };
 
   return (
@@ -164,7 +208,7 @@ export default function AdminSettingsPage() {
                   Storefront Settings & Thresholds
                 </h3>
                 <p className="text-xs text-silk-black/60 font-light">
-                  Configure brand name, shipping thresholds, and concierge contact emails.
+                  Configure brand name, shipping thresholds, and concierge contact emails stored in Database.
                 </p>
               </div>
             </div>
@@ -182,8 +226,8 @@ export default function AdminSettingsPage() {
                 </label>
                 <input
                   type="text"
-                  value={storeName}
-                  onChange={(e) => setStoreName(e.target.value)}
+                  value={brandName}
+                  onChange={(e) => setBrandName(e.target.value)}
                   className="w-full bg-silk-cream border border-silk-gold/30 rounded p-2.5 text-silk-black focus:outline-none"
                 />
               </div>
@@ -195,8 +239,8 @@ export default function AdminSettingsPage() {
                   </label>
                   <input
                     type="email"
-                    value={contactEmail}
-                    onChange={(e) => setContactEmail(e.target.value)}
+                    value={conciergeEmail}
+                    onChange={(e) => setConciergeEmail(e.target.value)}
                     className="w-full bg-silk-cream border border-silk-gold/30 rounded p-2.5 text-silk-black focus:outline-none"
                   />
                 </div>
@@ -228,9 +272,10 @@ export default function AdminSettingsPage() {
 
               <button
                 type="submit"
+                disabled={savingStore}
                 className="w-full bg-silk-gold text-silk-black hover:bg-silk-gold-light font-bold text-xs uppercase tracking-wider py-3 rounded shadow transition"
               >
-                Save Store Settings
+                {savingStore ? "Saving to Database..." : "Save Store Settings to Database"}
               </button>
             </form>
           </div>
