@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Sparkles, ChevronLeft, ChevronRight, Phone, Mail } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
 
 const ANNOUNCEMENTS = [
-  "✨ Handwoven Royal Muga Silk Sarees - 100% Certified Silk Mark",
-  "🚚 Complimentary Express Shipping Across India on Orders Above ₹5,000",
-  "🎁 Complimentary Luxury Wooden Scented Box Packaging on Bridal Silk Orders",
-  "🌿 Ahimsa Eri Silk (Peace Silk) Collection Now Available",
+  "Handwoven Royal Muga Silk Sarees • 100% Certified Silk Mark",
+  "Complimentary Express Shipping Across India on Orders Above ₹5,000",
+  "Complimentary Scented Wooden Box Packaging on Bridal Silk Orders",
+  "Organic Ahimsa Eri Silk (Peace Silk) Collection Now Available",
 ];
 
 export const AnnouncementBar = () => {
@@ -18,42 +18,42 @@ export const AnnouncementBar = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % ANNOUNCEMENTS.length);
-    }, 4500);
+    }, 5000);
     return () => clearInterval(timer);
   }, []);
 
   return (
-    <div className="bg-silk-maroon text-silk-ivory text-xs tracking-wider py-2 px-4 border-b border-silk-gold/30">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2">
-        <div className="hidden lg:flex items-center space-x-4 text-silk-gold-light/90">
-          <a href="tel:+919864012345" className="hover:text-silk-gold flex items-center gap-1 transition">
-            <Phone className="w-3 h-3" /> +91 98640 12345
+    <div className="bg-silk-maroon text-silk-ivory text-[10px] sm:text-[11px] tracking-[0.2em] font-serif uppercase py-2 px-4 border-b border-silk-gold/20">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        {/* Contact snippet */}
+        <div className="hidden lg:flex items-center space-x-3 text-silk-gold-light/80">
+          <a href="tel:+919864012345" className="hover:text-silk-gold transition">
+            +91 98640 12345
           </a>
-          <span className="text-silk-gold/40">•</span>
-          <a href="mailto:concierge@baishyasilk.com" className="hover:text-silk-gold flex items-center gap-1 transition">
-            <Mail className="w-3 h-3" /> concierge@baishyasilk.com
+          <span>•</span>
+          <a href="mailto:concierge@baishyasilk.com" className="hover:text-silk-gold transition">
+            concierge@baishyasilk.com
           </a>
         </div>
 
         {/* Sliding announcement text */}
-        <div className="flex items-center justify-center space-x-2 text-center font-medium min-h-[1.5rem]">
+        <div className="flex-1 flex items-center justify-center space-x-2 text-center text-silk-gold-light font-medium">
           <button
             onClick={() => setIndex((prev) => (prev - 1 + ANNOUNCEMENTS.length) % ANNOUNCEMENTS.length)}
             aria-label="Previous announcement"
-            className="text-silk-gold-light/60 hover:text-silk-gold p-0.5 transition"
+            className="text-silk-gold-light/50 hover:text-silk-gold transition p-0.5"
           >
-            <ChevronLeft className="w-3.5 h-3.5" />
+            <ChevronLeft className="w-3 h-3" />
           </button>
-          <span className="flex items-center gap-1.5 transition-all duration-300">
-            <Sparkles className="w-3 h-3 text-silk-gold" />
+          <span className="transition-all duration-300">
             {ANNOUNCEMENTS[index]}
           </span>
           <button
             onClick={() => setIndex((prev) => (prev + 1) % ANNOUNCEMENTS.length)}
             aria-label="Next announcement"
-            className="text-silk-gold-light/60 hover:text-silk-gold p-0.5 transition"
+            className="text-silk-gold-light/50 hover:text-silk-gold transition p-0.5"
           >
-            <ChevronRight className="w-3.5 h-3.5" />
+            <ChevronRight className="w-3 h-3" />
           </button>
         </div>
 
@@ -62,16 +62,13 @@ export const AnnouncementBar = () => {
           <a href="/track-order" className="hover:text-silk-gold transition hidden sm:inline">
             Track Order
           </a>
-          <span className="text-silk-gold/30 hidden sm:inline">•</span>
-          <div className="flex items-center bg-silk-maroon-dark/60 border border-silk-gold/30 rounded px-2 py-0.5">
-            <span className="text-[10px] text-silk-gold-light mr-1 font-semibold">CURRENCY:</span>
-            <button
-              onClick={() => setCurrency(currency === "INR" ? "USD" : "INR")}
-              className="font-bold text-silk-gold hover:underline uppercase text-[11px]"
-            >
-              {currency} {currency === "INR" ? "₹" : "$"}
-            </button>
-          </div>
+          <span className="hidden sm:inline opacity-30">•</span>
+          <button
+            onClick={() => setCurrency(currency === "INR" ? "USD" : "INR")}
+            className="font-bold text-silk-gold hover:underline uppercase text-[10px] tracking-widest"
+          >
+            {currency} ({currency === "INR" ? "₹" : "$"})
+          </button>
         </div>
       </div>
     </div>
