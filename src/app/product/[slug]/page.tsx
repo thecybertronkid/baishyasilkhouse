@@ -7,18 +7,12 @@ import { PRODUCTS } from "@/data/products";
 import {
   ShieldCheck,
   Heart,
-  ShoppingBag,
   Truck,
-  RotateCcw,
   Star,
   Check,
-  Share2,
   SlidersHorizontal,
-  Sparkles,
-  Play,
-  Rotate3d,
+  MessageCircle,
 } from "lucide-react";
-import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCompare } from "@/context/CompareContext";
 import { useStore } from "@/context/StoreContext";
@@ -91,15 +85,11 @@ export default function ProductDetailPage() {
     fetchProductFromDb();
   }, [slug]);
 
-  const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { addToCompare, isInCompare } = useCompare();
   const { currency } = useStore();
 
   const [selectedImg, setSelectedImg] = useState<number>(0);
-  const [selectedColor, setSelectedColor] = useState<string>(
-    product.colors?.[0] ? product.colors[0].name : "Standard"
-  );
   const [customBlouse, setCustomBlouse] = useState(false);
   const [pincode, setPincode] = useState("");
   const [deliveryResult, setDeliveryResult] = useState<{
@@ -107,7 +97,6 @@ export default function ProductDetailPage() {
     dateString: string;
     expressAvailable: boolean;
   } | null>(null);
-  const [added, setAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<"desc" | "craft" | "care" | "reviews">("desc");
 
   const handleCheckDelivery = (e: React.FormEvent) => {
@@ -116,10 +105,13 @@ export default function ProductDetailPage() {
     setDeliveryResult(res);
   };
 
-  const handleAddToCart = () => {
-    addToCart(product, 1, selectedColor, customBlouse);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+  const handleInquireWhatsApp = () => {
+    const text = encodeURIComponent(
+      `Hello Baishya Silk House Concierge, I would like to inquire about "${product.title}" (${formatPrice(product.price, currency)}).${
+        customBlouse ? " I am also interested in custom blouse stitching." : ""
+      }`
+    );
+    window.open(`https://wa.me/919864012345?text=${text}`, "_blank");
   };
 
   return (
@@ -132,7 +124,7 @@ export default function ProductDetailPage() {
           </Link>
           <span>/</span>
           <Link href="/shop" className="hover:text-silk-maroon transition">
-            Shop Catalog
+            Showroom Catalog
           </Link>
           <span>/</span>
           <span className="text-silk-maroon font-bold line-clamp-1">{product.title}</span>
@@ -206,7 +198,7 @@ export default function ProductDetailPage() {
                     </span>
                   )}
                 </div>
-                <p className="text-[10px] text-silk-black/50">Includes all taxes • Complimentary insured express delivery</p>
+                <p className="text-[10px] text-silk-black/50">Handloomed Masterpiece • Direct Sualkuchi Loom Inquiry</p>
               </div>
 
               <div className="flex items-center gap-1 bg-silk-cream px-3 py-1.5 rounded-full border border-silk-gold/30">
@@ -231,10 +223,8 @@ export default function ProductDetailPage() {
                 <span className="font-bold text-silk-maroon">{product.weavingStyle}</span>
               </div>
               <div>
-                <span className="text-silk-black/50 block">Inventory Stock</span>
-                <span className={`font-bold ${product.stock <= 5 ? "text-amber-600" : "text-silk-emerald"}`}>
-                  {product.stock} units in stock
-                </span>
+                <span className="text-silk-black/50 block">Availability</span>
+                <span className="font-bold text-silk-emerald">Woven on Demand / Showroom Ready</span>
               </div>
             </div>
 
@@ -249,32 +239,22 @@ export default function ProductDetailPage() {
                     className="rounded accent-silk-maroon"
                   />
                   <span className="font-serif font-bold text-xs text-silk-black uppercase">
-                    Custom Master Tailor Blouse Stitching (+₹1,500)
+                    Custom Master Tailor Blouse Stitching Inquiry
                   </span>
                 </div>
               </label>
               <p className="text-[11px] text-silk-black/60 pl-6">
-                Our in-house Sualkuchi tailors will stitch a custom blouse padded with silk lining tailored to your measurements.
+                Our in-house Sualkuchi tailors stitch custom blouses padded with pure silk lining tailored to your exact measurements.
               </p>
             </div>
 
-            {/* Actions (Add to Bag, Wishlist, Compare) */}
+            {/* Actions (WhatsApp Inquiry, Wishlist, Compare) */}
             <div className="space-y-3 pt-2">
               <button
-                onClick={handleAddToCart}
-                className={`w-full font-bold text-xs uppercase tracking-widest py-4 px-6 rounded-xl shadow-luxury transition flex items-center justify-center gap-2 ${
-                  added ? "bg-silk-emerald text-silk-ivory" : "bg-silk-maroon text-silk-gold hover:bg-silk-maroon-dark"
-                }`}
+                onClick={handleInquireWhatsApp}
+                className="w-full bg-silk-emerald text-silk-ivory hover:bg-emerald-800 font-bold text-xs uppercase tracking-widest py-4 px-6 rounded-xl shadow-luxury transition flex items-center justify-center gap-2"
               >
-                {added ? (
-                  <>
-                    <Check className="w-4 h-4" /> Added to Shopping Bag
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag className="w-4 h-4" /> Add to Shopping Bag
-                  </>
-                )}
+                <MessageCircle className="w-4 h-4 fill-current" /> Inquire via WhatsApp Concierge
               </button>
 
               <div className="grid grid-cols-2 gap-3">
@@ -305,7 +285,7 @@ export default function ProductDetailPage() {
             {/* PIN Code Delivery Estimator */}
             <div className="bg-silk-cream p-4 rounded-xl border border-silk-gold/20 space-y-3">
               <label className="font-serif font-bold text-xs text-silk-maroon uppercase flex items-center gap-1.5">
-                <Truck className="w-4 h-4 text-silk-gold" /> Check Delivery & Pincode Speed
+                <Truck className="w-4 h-4 text-silk-gold" /> Check Showroom Delivery Speed
               </label>
               <form onSubmit={handleCheckDelivery} className="flex gap-2">
                 <input
@@ -326,14 +306,14 @@ export default function ProductDetailPage() {
 
               {deliveryResult && (
                 <div className="text-xs font-semibold text-silk-emerald pt-1">
-                  ✓ Delivery available by {deliveryResult.dateString} via Insured Express Courier.
+                  ✓ Insured concierge delivery available by {deliveryResult.dateString}.
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Product Details Tabs (Description, Craft, Care, Reviews) */}
+        {/* Product Details Tabs */}
         <div className="bg-silk-ivory rounded-2xl border border-silk-gold/20 p-8 shadow-card space-y-6">
           <div className="flex border-b border-silk-gold/20 gap-8 font-serif text-xs uppercase tracking-widest font-bold">
             {[
@@ -373,7 +353,7 @@ export default function ProductDetailPage() {
             {activeTab === "reviews" && (
               <div className="space-y-4">
                 {product.reviews.length === 0 ? (
-                  <p className="italic text-silk-black/60">No reviews yet for this masterpiece. Be the first to leave a review!</p>
+                  <p className="italic text-silk-black/60">No reviews yet for this masterpiece.</p>
                 ) : (
                   product.reviews.map((r, i) => (
                     <div key={i} className="bg-silk-cream p-4 rounded-xl border border-silk-gold/20 space-y-1">
@@ -395,7 +375,7 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* Related Products Carousel */}
+        {/* Related Products */}
         <div className="space-y-6">
           <div className="border-b border-silk-gold/20 pb-4">
             <span className="text-[10px] font-serif font-bold tracking-[0.3em] text-silk-gold-dark uppercase block">

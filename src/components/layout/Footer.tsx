@@ -2,145 +2,161 @@
 
 import React from "react";
 import Link from "next/link";
-import {
-  Phone,
-  Mail,
-  MapPin,
-  ShieldCheck,
-  Award,
-  Truck,
-  RotateCcw,
-  Sparkles,
-  Instagram,
-  Facebook,
-  Youtube,
-} from "lucide-react";
+import { ShieldCheck, MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react";
 
 export const Footer = () => {
   return (
-    <footer className="bg-silk-black text-silk-ivory pt-16 pb-24 md:pb-12 border-t-4 border-silk-gold">
-      {/* Upper Value Proposition Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-12 border-b border-silk-gold/20 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-        <div className="flex flex-col items-center p-4 rounded bg-silk-charcoal/40 border border-silk-gold/10">
-          <ShieldCheck className="w-8 h-8 text-silk-gold mb-2" />
-          <h4 className="font-serif font-bold text-sm text-silk-gold-light">Silk Mark Certified</h4>
-          <p className="text-xs text-silk-ivory/60 mt-1">100% Guaranteed Pure Indian Handloom Silk</p>
-        </div>
+    <footer className="bg-silk-maroon text-silk-ivory border-t border-silk-gold/30 font-sans">
+      {/* Brand Craftsmanship Guarantee Banner */}
+      <div className="border-b border-silk-gold/20 py-10 bg-silk-maroon-dark">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div className="space-y-2">
+            <div className="w-10 h-10 bg-silk-gold/10 text-silk-gold rounded-full flex items-center justify-center mx-auto">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <h4 className="font-serif font-bold text-xs uppercase tracking-widest text-silk-gold">
+              100% Silk Mark Certified
+            </h4>
+            <p className="text-[11px] text-silk-ivory/70 font-light">
+              Authenticated with Government of India Silk Mark Board security holograms.
+            </p>
+          </div>
 
-        <div className="flex flex-col items-center p-4 rounded bg-silk-charcoal/40 border border-silk-gold/10">
-          <Award className="w-8 h-8 text-silk-gold mb-2" />
-          <h4 className="font-serif font-bold text-sm text-silk-gold-light">Direct Sualkuchi Looms</h4>
-          <p className="text-xs text-silk-ivory/60 mt-1">Woven by Master Artisans of Assam</p>
-        </div>
+          <div className="space-y-2">
+            <div className="w-10 h-10 bg-silk-gold/10 text-silk-gold rounded-full flex items-center justify-center mx-auto">
+              <MapPin className="w-5 h-5" />
+            </div>
+            <h4 className="font-serif font-bold text-xs uppercase tracking-widest text-silk-gold">
+              Sualkuchi Heritage Looms
+            </h4>
+            <p className="text-[11px] text-silk-ivory/70 font-light">
+              Directly supporting 120+ master artisan weaving families in Assam.
+            </p>
+          </div>
 
-        <div className="flex flex-col items-center p-4 rounded bg-silk-charcoal/40 border border-silk-gold/10">
-          <Truck className="w-8 h-8 text-silk-gold mb-2" />
-          <h4 className="font-serif font-bold text-sm text-silk-gold-light">Free Worldwide Express</h4>
-          <p className="text-xs text-silk-ivory/60 mt-1">Free Shipping on domestic orders above ₹5,000</p>
-        </div>
-
-        <div className="flex flex-col items-center p-4 rounded bg-silk-charcoal/40 border border-silk-gold/10">
-          <RotateCcw className="w-8 h-8 text-silk-gold mb-2" />
-          <h4 className="font-serif font-bold text-sm text-silk-gold-light">Hassle-Free Returns</h4>
-          <p className="text-xs text-silk-ivory/60 mt-1">7 Days Easy Exchange & Velvet Packaging</p>
+          <div className="space-y-2">
+            <div className="w-10 h-10 bg-silk-gold/10 text-silk-gold rounded-full flex items-center justify-center mx-auto">
+              <MessageCircle className="w-5 h-5" />
+            </div>
+            <h4 className="font-serif font-bold text-xs uppercase tracking-widest text-silk-gold">
+              Bespoke Bridal Concierge
+            </h4>
+            <p className="text-[11px] text-silk-ivory/70 font-light">
+              Personalized video consultations & custom loom weaving for brides.
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Main Footer Link Columns */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
-        {/* Brand Column */}
-        <div className="lg:col-span-2 space-y-4">
-          <Link href="/" className="inline-block">
-            <span className="font-serif font-bold text-2xl tracking-widest text-silk-gold">
-              BAISHYA SILK HOUSE
-            </span>
-            <p className="text-[10px] tracking-[0.3em] uppercase text-silk-beige/70">
-              Assam Heritage • Estd 1984
-            </p>
-          </Link>
-          <p className="text-xs text-silk-ivory/70 leading-relaxed max-w-sm">
-            Preserving centuries of Assam sericulture. We craft authentic Golden Muga Silk, Pat Silk Mekhela Chadors, Eri Ahimsa Silk, and royal handloom bridal wear in Sualkuchi, Assam.
+      {/* Main Footer Links */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 grid grid-cols-1 md:grid-cols-4 gap-12 text-xs">
+        {/* Col 1: Brand Lore */}
+        <div className="space-y-4 md:col-span-1">
+          <span className="font-serif font-bold text-lg tracking-[0.2em] text-silk-gold uppercase block">
+            BAISHYA SILK HOUSE
+          </span>
+          <p className="text-silk-ivory/80 leading-relaxed font-light">
+            Crafting royal Assamese silk heirlooms since 1986. Home to GI-tagged Golden Muga, Mulberry Pat, and Eri Ahimsa Peace Silk.
           </p>
-          <div className="pt-2 flex items-center space-x-3 text-silk-gold">
-            <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="p-2 rounded-full bg-silk-charcoal hover:bg-silk-maroon hover:text-silk-ivory transition">
-              <Instagram className="w-4 h-4" />
-            </a>
-            <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook" className="p-2 rounded-full bg-silk-charcoal hover:bg-silk-maroon hover:text-silk-ivory transition">
-              <Facebook className="w-4 h-4" />
-            </a>
-            <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube" className="p-2 rounded-full bg-silk-charcoal hover:bg-silk-maroon hover:text-silk-ivory transition">
-              <Youtube className="w-4 h-4" />
+          <div className="pt-2">
+            <a
+              href="https://wa.me/919864012345?text=Hello%20Baishya%20Silk%20House,%20I%20would%20like%20to%20inquire%20about%20your%20handloom%20silk%20collection."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-silk-emerald text-silk-ivory hover:bg-emerald-800 text-[10px] font-serif font-bold uppercase tracking-wider px-4 py-2.5 rounded-full transition shadow"
+            >
+              <MessageCircle className="w-4 h-4 fill-current" /> Contact Concierge WhatsApp
             </a>
           </div>
         </div>
 
-        {/* Quick Collections */}
+        {/* Col 2: Showroom Collections */}
         <div className="space-y-3">
-          <h4 className="font-serif font-bold text-sm uppercase tracking-widest text-silk-gold border-b border-silk-gold/20 pb-2">
-            Collections
+          <h4 className="font-serif font-bold text-xs uppercase tracking-widest text-silk-gold border-b border-silk-gold/20 pb-2">
+            Silk Collections
           </h4>
-          <ul className="space-y-2 text-xs text-silk-ivory/70">
-            <li><Link href="/shop?silk=Muga+Silk" className="hover:text-silk-gold transition">Golden Muga Silk Sarees</Link></li>
-            <li><Link href="/shop?category=Mekhela+Chador" className="hover:text-silk-gold transition">Assam Mekhela Chador</Link></li>
-            <li><Link href="/shop?silk=Eri+Silk" className="hover:text-silk-gold transition">Ahimsa Eri Silk Stoles</Link></li>
-            <li><Link href="/shop?silk=Banarasi+Katan" className="hover:text-silk-gold transition">Banarasi Katan Brocades</Link></li>
-            <li><Link href="/shop?silk=Kanjeevaram+Pure+Silk" className="hover:text-silk-gold transition">Kanjeevaram Gold Sarees</Link></li>
-            <li><Link href="/shop?category=Men%27s+Silk+Wear" className="hover:text-silk-gold transition">Men's Handloom Kurtas</Link></li>
+          <ul className="space-y-2 text-silk-ivory/75 font-serif uppercase tracking-wider text-[11px]">
+            <li>
+              <Link href="/shop?silk=Muga+Silk" className="hover:text-silk-gold transition">
+                Assam Muga Silk Sarees
+              </Link>
+            </li>
+            <li>
+              <Link href="/shop?category=Mekhela+Chador" className="hover:text-silk-gold transition">
+                Pat Silk Mekhela Chador
+              </Link>
+            </li>
+            <li>
+              <Link href="/shop?silk=Eri+Silk" className="hover:text-silk-gold transition">
+                Eri Ahimsa Stoles & Fabrics
+              </Link>
+            </li>
+            <li>
+              <Link href="/shop?category=Men%27s+Silk+Wear" className="hover:text-silk-gold transition">
+                Men's Silk Kurtas & Dhotis
+              </Link>
+            </li>
           </ul>
         </div>
 
-        {/* Support & Care */}
+        {/* Col 3: Brand Story & Heritage */}
         <div className="space-y-3">
-          <h4 className="font-serif font-bold text-sm uppercase tracking-widest text-silk-gold border-b border-silk-gold/20 pb-2">
-            Customer Care
+          <h4 className="font-serif font-bold text-xs uppercase tracking-widest text-silk-gold border-b border-silk-gold/20 pb-2">
+            Brand Heritage
           </h4>
-          <ul className="space-y-2 text-xs text-silk-ivory/70">
-            <li><Link href="/track-order" className="hover:text-silk-gold transition">Track Your Order</Link></li>
-            <li><Link href="/faq" className="hover:text-silk-gold transition">Frequently Asked Questions</Link></li>
-            <li><Link href="/shipping" className="hover:text-silk-gold transition">Shipping & Delivery Policy</Link></li>
-            <li><Link href="/returns" className="hover:text-silk-gold transition">Returns & Exchange Policy</Link></li>
-            <li><Link href="/privacy" className="hover:text-silk-gold transition">Privacy Policy</Link></li>
-            <li><Link href="/terms" className="hover:text-silk-gold transition">Terms & Conditions</Link></li>
+          <ul className="space-y-2 text-silk-ivory/75 font-serif uppercase tracking-wider text-[11px]">
+            <li>
+              <Link href="/about" className="hover:text-silk-gold transition">
+                Our Sualkuchi Legacy
+              </Link>
+            </li>
+            <li>
+              <Link href="/blog" className="hover:text-silk-gold transition">
+                Assamese Silk Journal
+              </Link>
+            </li>
+            <li>
+              <Link href="/faq" className="hover:text-silk-gold transition">
+                Silk Care & FAQs
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact" className="hover:text-silk-gold transition">
+                Visit Sualkuchi Showroom
+              </Link>
+            </li>
           </ul>
         </div>
 
-        {/* Showroom & Contact */}
+        {/* Col 4: Showroom Address & Hours */}
         <div className="space-y-3">
-          <h4 className="font-serif font-bold text-sm uppercase tracking-widest text-silk-gold border-b border-silk-gold/20 pb-2">
-            Flagship Atelier
+          <h4 className="font-serif font-bold text-xs uppercase tracking-widest text-silk-gold border-b border-silk-gold/20 pb-2">
+            Flagship Showroom
           </h4>
-          <div className="space-y-2 text-xs text-silk-ivory/70">
+          <div className="space-y-2 text-silk-ivory/80 text-[11px]">
             <p className="flex items-start gap-2">
               <MapPin className="w-4 h-4 text-silk-gold flex-shrink-0 mt-0.5" />
-              <span>Silk Street, Sualkuchi, Kamrup District, Assam - 781103</span>
+              <span>Baishya Silk House, Silk Street, Sualkuchi, Kamrup District, Assam - 781103</span>
             </p>
             <p className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-silk-gold flex-shrink-0" />
-              <span>+91 98640 12345 / 0361 245890</span>
+              <span>+91 98640 12345 / +91 361 2840123</span>
             </p>
             <p className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-silk-gold flex-shrink-0" />
               <span>concierge@baishyasilk.com</span>
             </p>
-          </div>
-          <div className="pt-2">
-            <span className="text-[10px] text-silk-gold/80 block uppercase font-bold tracking-wider">Accepted Payment Gateways</span>
-            <div className="flex items-center gap-2 mt-1.5 opacity-80">
-              <span className="bg-silk-charcoal px-2 py-1 rounded text-[10px] font-bold text-silk-gold border border-silk-gold/30">RAZORPAY</span>
-              <span className="bg-silk-charcoal px-2 py-1 rounded text-[10px] font-bold text-silk-gold border border-silk-gold/30">STRIPE</span>
-              <span className="bg-silk-charcoal px-2 py-1 rounded text-[10px] font-bold text-silk-gold border border-silk-gold/30">UPI</span>
-              <span className="bg-silk-charcoal px-2 py-1 rounded text-[10px] font-bold text-silk-gold border border-silk-gold/30">COD</span>
-            </div>
+            <p className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-silk-gold flex-shrink-0" />
+              <span>Mon - Sat: 9:30 AM - 7:30 PM</span>
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Lower Copyright Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 border-t border-silk-gold/20 flex flex-col md:flex-row items-center justify-between text-[11px] text-silk-ivory/50">
-        <p>© 2026 Baishya Silk House. All rights reserved. Handcrafted in Sualkuchi, Assam, India.</p>
-        <p className="mt-2 md:mt-0 flex items-center gap-1">
-          <span>Designed with</span> <Sparkles className="w-3 h-3 text-silk-gold inline" /> <span>Luxury Heritage Crafts</span>
-        </p>
+      {/* Sub-footer Copyright */}
+      <div className="border-t border-silk-gold/20 py-6 bg-silk-maroon-dark text-[10px] text-center text-silk-ivory/60 font-serif uppercase tracking-widest">
+        © {new Date().getFullYear()} BAISHYA SILK HOUSE. ALL RIGHTS RESERVED. SUALKUCHI, ASSAM.
       </div>
     </footer>
   );

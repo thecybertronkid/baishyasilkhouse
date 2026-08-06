@@ -2,251 +2,201 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import {
-  Search,
-  Heart,
-  ShoppingBag,
-  User,
-  SlidersHorizontal,
-  ChevronDown,
-  Menu,
-  X,
-} from "lucide-react";
-import { useCart } from "@/context/CartContext";
+import { Search, Heart, Menu, MessageCircle } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
-import { useCompare } from "@/context/CompareContext";
-import { useAuth } from "@/context/AuthContext";
 import { useStore } from "@/context/StoreContext";
-import { MegaMenu } from "./MegaMenu";
 
 export const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [activeMegaTab, setActiveMegaTab] = useState<string | null>(null);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const { itemCount, setIsCartOpen } = useCart();
   const { wishlistCount } = useWishlist();
-  const { compareList } = useCompare();
-  const { user } = useAuth();
   const { setIsSearchOpen } = useStore();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 30);
+      setIsScrolled(window.scrollY > 40);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const navLinks = [
+    { label: "HOME", href: "/" },
+    {
+      label: "SILK SAREES ▾",
+      href: "/shop?category=Silk+Sarees",
+      subLinks: [
+        { label: "GI-Tagged Assam Muga Silk", href: "/shop?silk=Muga+Silk" },
+        { label: "Pure Sualkuchi Mulberry Pat Silk", href: "/shop?silk=Pat+Silk" },
+        { label: "Bridal Zari Silk Sarees", href: "/shop?category=Silk+Sarees&bridal=true" },
+        { label: "Eri Ahimsa Peace Silk", href: "/shop?silk=Eri+Silk" },
+      ],
+    },
+    {
+      label: "MEKHELA CHADOR ▾",
+      href: "/shop?category=Mekhela+Chador",
+      subLinks: [
+        { label: "Muga Silk Mekhela Chador", href: "/shop?category=Mekhela+Chador&silk=Muga+Silk" },
+        { label: "Pat Silk Bridal Mekhela Chador", href: "/shop?category=Mekhela+Chador&silk=Pat+Silk" },
+        { label: "Daily Comfort Eri Silk Sets", href: "/shop?category=Mekhela+Chador&silk=Eri+Silk" },
+      ],
+    },
+    {
+      label: "MENSWEAR ▾",
+      href: "/shop?category=Men%27s+Silk+Wear",
+      subLinks: [
+        { label: "Assam Muga Silk Kurta Sets", href: "/shop?category=Men%27s+Silk+Wear" },
+        { label: "Traditional Assamese Silk Dhoti", href: "/shop?category=Men%27s+Silk+Wear" },
+        { label: "Royal Eri Silk Waistcoats", href: "/shop?category=Men%27s+Silk+Wear" },
+      ],
+    },
+    { label: "SHOWROOM CATALOG", href: "/shop" },
+    { label: "OUR HERITAGE", href: "/about" },
+    { label: "CONTACT CONCIERGE", href: "/contact" },
+  ];
+
   return (
     <header
-      className={`sticky top-0 z-30 transition-all duration-300 border-b ${
-        isScrolled
-          ? "bg-silk-ivory/95 backdrop-blur-md border-silk-gold/20 shadow-card py-2"
-          : "bg-silk-ivory border-silk-gold/15 py-4"
+      className={`sticky top-0 z-40 bg-silk-ivory transition-all duration-300 ${
+        isScrolled ? "shadow-md py-1 border-b border-silk-gold/30" : "py-3"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-3">
-        {/* Top Tier: 3-Column Luxury Layout (Left Quick Action, Center Logo, Right User Actions) */}
-        <div className="flex items-center justify-between border-b border-silk-gold/10 pb-3">
-          {/* Left Column: Mobile Hamburger & Search Trigger */}
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-1.5 text-silk-maroon hover:text-silk-gold transition"
-              aria-label="Toggle Navigation Menu"
-            >
-              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+      {/* Tier 1: Brand Logo & Actions */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
+        {/* Left: Mobile Menu Trigger & Search */}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden p-2 text-silk-maroon hover:text-silk-gold transition"
+            aria-label="Open Navigation Menu"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
 
-            <button
-              onClick={() => setIsSearchOpen(true)}
-              className="hidden lg:flex items-center gap-2 text-xs font-serif uppercase tracking-widest text-silk-black/70 hover:text-silk-maroon transition"
-            >
-              <Search className="w-4 h-4 text-silk-gold" />
-              <span>Search Catalog</span>
-            </button>
-          </div>
-
-          {/* Center Column: Centered Regal Brand Logo */}
-          <Link href="/" className="flex flex-col items-center group text-center">
-            <span className="font-serif font-bold text-2xl sm:text-3xl tracking-[0.25em] text-silk-maroon group-hover:text-silk-gold transition duration-300 uppercase">
-              BAISHYA SILK HOUSE
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="p-2 text-silk-maroon hover:text-silk-gold transition flex items-center gap-2"
+            title="Search Catalog"
+          >
+            <Search className="w-5 h-5" />
+            <span className="hidden sm:inline text-xs font-serif tracking-widest uppercase text-silk-black/70">
+              Search Catalog
             </span>
-            <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.3em] text-silk-gold-dark font-medium -mt-0.5">
-              <span>SUALKUCHI ASSAM</span>
-              <span className="text-silk-gold/40">•</span>
-              <span>ESTD 1984</span>
-            </div>
-          </Link>
-
-          {/* Right Column: User Actions (Wishlist, Compare, Account, Cart) */}
-          <div className="flex items-center space-x-5 text-silk-maroon">
-            {/* Search Icon for Mobile */}
-            <button
-              onClick={() => setIsSearchOpen(true)}
-              className="lg:hidden p-1 hover:text-silk-gold transition"
-              aria-label="Search"
-            >
-              <Search className="w-5 h-5" />
-            </button>
-
-            {/* Compare Matrix */}
-            <Link
-              href="/compare"
-              className="hidden sm:flex relative p-1 hover:text-silk-gold transition"
-              title="Compare Products"
-            >
-              <SlidersHorizontal className="w-4.5 h-4.5" />
-              {compareList.length > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-silk-emerald text-silk-ivory text-[9px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center">
-                  {compareList.length}
-                </span>
-              )}
-            </Link>
-
-            {/* Wishlist */}
-            <Link
-              href="/wishlist"
-              className="relative p-1 hover:text-silk-gold transition"
-              title="Wishlist"
-            >
-              <Heart className="w-4.5 h-4.5" />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-silk-maroon text-silk-ivory text-[9px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center">
-                  {wishlistCount}
-                </span>
-              )}
-            </Link>
-
-            {/* User Account */}
-            <Link
-              href={user ? (user.role === "admin" ? "/admin" : "/account") : "/login"}
-              className="p-1 hover:text-silk-gold transition flex items-center gap-1.5"
-              title={user ? user.name : "Sign In"}
-            >
-              <User className="w-4.5 h-4.5" />
-              {user && (
-                <span className="hidden xl:inline text-[11px] font-bold text-silk-black/80 max-w-[70px] truncate">
-                  {user.name.split(" ")[0]}
-                </span>
-              )}
-            </Link>
-
-            {/* Cart Bag */}
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative p-1.5 bg-silk-maroon text-silk-gold hover:bg-silk-maroon-dark transition rounded-full shadow-sm"
-              title="Shopping Cart"
-              aria-label="Shopping Cart"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-silk-gold text-silk-maroon font-extrabold text-[9px] rounded-full w-4 h-4 flex items-center justify-center shadow-sm">
-                  {itemCount}
-                </span>
-              )}
-            </button>
-          </div>
+          </button>
         </div>
 
-        {/* Bottom Tier: Centered Navigation Menu Bar (Desktop) */}
-        <nav className="hidden lg:flex items-center justify-center space-x-10 font-serif text-xs uppercase tracking-[0.25em] font-semibold text-silk-black/80 pt-1">
-          <Link href="/" className="hover:text-silk-maroon transition py-1">
-            Home
-          </Link>
+        {/* Center: Brand Regal Logo */}
+        <Link href="/" className="text-center group py-1">
+          <span className="font-serif text-xl sm:text-2xl font-extrabold tracking-[0.25em] text-silk-maroon group-hover:text-silk-gold transition duration-300 block uppercase">
+            BAISHYA SILK HOUSE
+          </span>
+          <span className="text-[9px] uppercase tracking-[0.35em] text-silk-gold-dark font-serif font-bold block">
+            SUALKUCHI • ESTD 1986
+          </span>
+        </Link>
 
-          <div
-            onMouseEnter={() => setActiveMegaTab("sarees")}
-            className="relative cursor-pointer py-1 hover:text-silk-maroon transition flex items-center gap-1.5"
+        {/* Right: Actions (Wishlist & Concierge WhatsApp) */}
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Link
+            href="/wishlist"
+            className="p-2 text-silk-maroon hover:text-silk-gold transition relative"
+            title="Saved Masterpieces"
           >
-            <span>Silk Sarees</span>
-            <ChevronDown className="w-3 h-3 text-silk-gold" />
-          </div>
+            <Heart className="w-5 h-5" />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-silk-maroon text-silk-gold text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-silk-gold">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
 
-          <div
-            onMouseEnter={() => setActiveMegaTab("mekhela")}
-            className="relative cursor-pointer py-1 hover:text-silk-maroon transition flex items-center gap-1.5"
+          <a
+            href="https://wa.me/919864012345?text=Hello%20Baishya%20Silk%20House,%20I%20would%20like%20to%20inquire%20about%20your%20handloom%20silk%20collection."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:flex items-center gap-2 bg-silk-emerald text-silk-ivory hover:bg-emerald-800 text-[11px] font-serif font-bold uppercase tracking-wider px-3.5 py-2 rounded-full shadow transition"
           >
-            <span>Mekhela Chador</span>
-            <ChevronDown className="w-3 h-3 text-silk-gold" />
-          </div>
+            <MessageCircle className="w-4 h-4 fill-current" />
+            <span>Concierge Inquiry</span>
+          </a>
+        </div>
+      </div>
 
-          <div
-            onMouseEnter={() => setActiveMegaTab("menswear")}
-            className="relative cursor-pointer py-1 hover:text-silk-maroon transition flex items-center gap-1.5"
-          >
-            <span>Menswear</span>
-            <ChevronDown className="w-3 h-3 text-silk-gold" />
-          </div>
+      {/* Tier 2: Dedicated Single-Line Navigation Links Bar */}
+      <div className="hidden lg:block border-t border-silk-gold/20 mt-2 pt-2.5">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-center gap-8 font-serif text-xs uppercase tracking-[0.2em] font-semibold text-silk-black/90">
+          {navLinks.map((link) => (
+            <div key={link.label} className="relative group py-1">
+              <Link
+                href={link.href}
+                className="hover:text-silk-maroon transition duration-200 whitespace-nowrap block"
+              >
+                {link.label}
+              </Link>
 
-          <Link href="/shop" className="hover:text-silk-maroon transition py-1">
-            Shop Catalog
-          </Link>
-
-          <Link href="/about" className="hover:text-silk-maroon transition py-1">
-            Our Heritage
-          </Link>
-
-          <Link href="/contact" className="hover:text-silk-maroon transition py-1">
-            Contact
-          </Link>
+              {/* Sub-menu Dropdown */}
+              {link.subLinks && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-64 bg-silk-ivory border border-silk-gold/30 shadow-2xl rounded-xl p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                  <div className="space-y-1">
+                    {link.subLinks.map((sub) => (
+                      <Link
+                        key={sub.label}
+                        href={sub.href}
+                        className="block px-3 py-2 text-[11px] text-silk-black hover:bg-silk-beige hover:text-silk-maroon rounded transition font-medium normal-case tracking-normal"
+                      >
+                        {sub.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
         </nav>
       </div>
 
-      {/* Desktop Mega Menu Overlay */}
-      <MegaMenu activeTab={activeMegaTab} onClose={() => setActiveMegaTab(null)} />
-
-      {/* Mobile Drawer Overlay */}
+      {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm">
-          <div className="w-4/5 max-w-sm bg-silk-ivory h-full shadow-2xl p-6 overflow-y-auto flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between border-b border-silk-gold/20 pb-4 mb-6">
-                <span className="font-serif font-bold text-silk-maroon text-base uppercase tracking-widest">
-                  Menu Navigation
+          <div className="w-4/5 max-w-xs bg-silk-ivory h-full shadow-2xl p-6 overflow-y-auto flex flex-col justify-between">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between border-b border-silk-gold/20 pb-4">
+                <span className="font-serif font-bold text-silk-maroon tracking-wider text-base uppercase">
+                  BAISHYA SILK HOUSE
                 </span>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 text-silk-black hover:text-silk-gold"
+                  className="text-silk-black hover:text-silk-gold font-bold text-xl"
                 >
-                  <X className="w-5 h-5" />
+                  ✕
                 </button>
               </div>
 
-              <div className="space-y-4 font-serif text-sm uppercase tracking-widest text-silk-black">
-                <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="block py-2 border-b border-silk-beige hover:text-silk-maroon">
-                  Home
-                </Link>
-                <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="block py-2 border-b border-silk-beige hover:text-silk-maroon">
-                  All Silk Sarees & Mekhela Chadors
-                </Link>
-                <Link href="/shop?category=Mekhela+Chador" onClick={() => setIsMobileMenuOpen(false)} className="block py-2 border-b border-silk-beige hover:text-silk-maroon">
-                  Mekhela Chador
-                </Link>
-                <Link href="/shop?category=Men%27s+Silk+Wear" onClick={() => setIsMobileMenuOpen(false)} className="block py-2 border-b border-silk-beige hover:text-silk-maroon">
-                  Menswear
-                </Link>
-                <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="block py-2 border-b border-silk-beige hover:text-silk-maroon">
-                  Our Heritage & Artisans
-                </Link>
-                <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="block py-2 border-b border-silk-beige hover:text-silk-maroon">
-                  Contact Us
-                </Link>
-                <Link href="/track-order" onClick={() => setIsMobileMenuOpen(false)} className="block py-2 border-b border-silk-beige hover:text-silk-maroon">
-                  Track Order
-                </Link>
-                {user?.role === "admin" && (
-                  <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="block py-2 text-silk-maroon font-bold border-b border-silk-beige">
-                    Admin Control Panel
+              <nav className="space-y-3 font-serif text-xs uppercase tracking-wider font-semibold">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block py-2 text-silk-black hover:text-silk-maroon border-b border-silk-gold/10"
+                  >
+                    {link.label.replace(" ▾", "")}
                   </Link>
-                )}
-              </div>
+                ))}
+              </nav>
             </div>
 
-            <div className="pt-6 border-t border-silk-gold/20 text-center">
-              <p className="text-[10px] text-silk-black/60 font-serif tracking-widest uppercase">
-                100% Pure Silk Mark Certified • Sualkuchi Assam
+            <div className="pt-6 border-t border-silk-gold/20 space-y-3 text-center">
+              <a
+                href="https://wa.me/919864012345?text=Hello%20Baishya%20Silk%20House,%20I%20would%20like%20to%20inquire%20about%20your%20handloom%20silk%20collection."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 bg-silk-emerald text-silk-ivory font-bold text-xs uppercase tracking-wider py-3 rounded-full shadow"
+              >
+                <MessageCircle className="w-4 h-4 fill-current" /> WhatsApp Concierge Inquiry
+              </a>
+              <p className="text-[10px] text-silk-gold-dark font-serif font-bold tracking-widest uppercase">
+                SUALKUCHI, ASSAM • ESTD 1986
               </p>
             </div>
           </div>
